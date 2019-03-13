@@ -29,11 +29,11 @@
 
 (spec/def ::api (spec/keys :req-un [::temperature ::orientation]))
 
-(defn api [{{:keys [temperature orientation]} :query-params :keys [db enqueuer] :as request}]
-  (go
-    (-> enqueuer :channel (>! (playground.jobs.sample/new temperature))))
-  {:status 200
-   :body   {:temperature temperature :orientation orientation}})
+;; (defn api [{{:keys [temperature orientation]} :query-params :keys [db enqueuer] :as request}]
+;;   (go
+;;     (-> enqueuer :channel (>! (playground.jobs.sample/new temperature))))
+;;   {:status 200
+;;    :body   {:temperature temperature :orientation orientation}})
 
 (defn param-spec-interceptor
   "Coerces params according to a spec. If invalid, aborts the interceptor-chain with 422, explaining the issue."
