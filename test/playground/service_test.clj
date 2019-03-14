@@ -5,10 +5,10 @@
    [io.pedestal.http :as bootstrap]
    [playground.service :as service]))
 
-(def service
+#_(def service
   (::bootstrap/service-fn (bootstrap/create-servlet service/service)))
 
-(deftest home-page-test
+#_(deftest home-page-test
   (is (= (-> service (response-for :get "/") :body)
          "Hello World!"))
   (is (= (-> service (response-for :get "/") :headers)
@@ -21,7 +21,7 @@
           "X-Permitted-Cross-Domain-Policies" "none"
           "Content-Security-Policy" "object-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https: http:;"})))
 
-(deftest about-page-test
+#_(deftest about-page-test
   (is (-> service (response-for :get "/about") :body (.contains "Clojure 1.8")))
   (is (= (-> service (response-for :get "/about") :headers)
          {"Content-Type" "text/html;charset=UTF-8"

@@ -29,11 +29,13 @@
 
 (spec/def ::api (spec/keys :req-un [::temperature ::orientation]))
 
-;; (defn api [{{:keys [temperature orientation]} :query-params :keys [db enqueuer] :as request}]
-;;   (go
-;;     (-> enqueuer :channel (>! (playground.jobs.sample/new temperature))))
-;;   {:status 200
-;;    :body   {:temperature temperature :orientation orientation}})
+(defn api [{{:keys [temperature orientation]} :query-params :keys [db] :as request}]
+  #_(go
+    (-> enqueuer :channel (>! (playground.jobs.sample/new temperature))))
+  {:status 200
+   :body   {:temperature temperature :orientation orientation}})
+
+
 
 (defn param-spec-interceptor
   "Coerces params according to a spec. If invalid, aborts the interceptor-chain with 422, explaining the issue."
@@ -56,7 +58,9 @@
                     components))
    :name  ::context-injector})
 
-(def components-to-inject [:db :background-processor :enqueuer])
+(def components-to-inject [:db
+                           #_:background-processor #_:enqueuer
+                           ])
 
 (def component-interceptors
   (conj (mapv pedestal-component/using-component components-to-inject)
@@ -71,7 +75,9 @@
     ["/api" :get (into component-interceptors [http/json-body (param-spec-interceptor ::api :query-params) `api])]
     ["/invoices/insert" :get (into component-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :query-params) `invoices.insert/perform])]
     ["/invoices/:id" :get (into component-interceptors [http/json-body (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoices.retrieve/perform])]
-    ["/invoices/delete" :get (into component-interceptors [http/json-body `invoices.delete/perform])]})
+    ["/invoices/delete" :get (into component-interceptors [http/json-body `invoices.delete/perform])]
+    ;; ["/nests/:species" :get (into component-interceptors [http/json-body (param-spec-interceptor ::invoices.retrieve/api :path-params) `nests.retrieve/perform])]
+    })
 
 (comment
   (def routes
