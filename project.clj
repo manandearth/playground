@@ -3,8 +3,9 @@
   :url ""
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[amazonica "0.3.125"]
-                 [background-processing "0.1.0-SNAPSHOT"]
+  :dependencies [
+                 #_[amazonica "0.3.125"]
+                 #_[background-processing "0.1.0-SNAPSHOT"]
                  [better-cond "1.0.1"]
                  [ch.qos.logback/logback-classic "1.1.8" :exclusions [org.slf4j/slf4j-api]]
                  [com.gfredericks/how-to-ns "0.1.9"]
@@ -28,7 +29,10 @@
   :repl-options {:port 41234}
   :min-lein-version "2.0.0"
   :resource-paths ["config" "resources"]
-  :profiles {:dev {:dependencies [[io.pedestal/pedestal.service-tools "0.5.3"]]
+  :profiles {:dev {:dependencies [[io.pedestal/pedestal.service-tools "0.5.3"]
+                                  [com.stuartsierra/component.repl "0.2.0"]
+                                  [org.clojure/tools.namespace "0.2.11"]
+                                  [org.clojure/tools.nrepl "0.2.13" :exclusions [org.clojure/clojure]]]
                    :source-paths ["dev"]}
              :uberjar {:aot [playground.server]}}
   :main ^{:skip-aot true} playground.server)
