@@ -19,3 +19,5 @@
                    (logic/to-serialize))]
     {:status 200
      :body   result}))
+
+
