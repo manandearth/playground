@@ -73,10 +73,13 @@
   #{["/" :get (conj common-interceptors `home-page)]
     ["/about" :get (conj common-interceptors `about-page)]
     ["/api" :get (into component-interceptors [http/json-body (param-spec-interceptor ::api :query-params) `api])]
-    ["/invoices/insert" :get (into component-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :query-params) `invoices.insert/perform])]
+    ;;FIXME change the routes definition format from: (def routes #{...})
+    ;;to (def routes (io.pedestal.http.route.definition.table/table-routes ...))
+    ;;as "/invoices/:id" is conflicting with "/invoices/insert"
+    ["/invoices-insert" :get (into component-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :query-params) `invoices.insert/perform])]
     ["/invoices/:id" :get (into component-interceptors [http/json-body (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoices.retrieve/perform])]
+
     ["/invoices/delete" :get (into component-interceptors [http/json-body `invoices.delete/perform])]
-    ;; ["/nests/:species" :get (into component-interceptors [http/json-body (param-spec-interceptor ::invoices.retrieve/api :path-params) `nests.retrieve/perform])]
     })
 
 (comment
@@ -132,3 +135,4 @@
                              ;; :key-password "password"
                              ;; :ssl-port 8443
                              :ssl? false}})
+
