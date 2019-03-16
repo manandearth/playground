@@ -20,8 +20,15 @@
         record (->> (logic/to-query id)
                     (h/format)
                     (jdbc/query db)
-                    (first))]
-    (if record
+                    (first))
+        all-records (->> (logic/all-query)
+                         (h/format)
+                         (jdbc/query db))
+        ]
+    (if (= id 0)
       {:status 200
-       :body   record}
-      {:status 404})))
+       :body all-records}
+      (if record
+        {:status 200
+         :body   record}
+        {:status 404}))))

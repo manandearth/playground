@@ -4,3 +4,7 @@
   {:select [:*]
    :from   [:users]
    :where  [:= :id id]})
+
+(defn all-query []
+  {:select [:*]
+   :from [:users]})
