@@ -13,16 +13,27 @@
    [playground.services.invoices.insert.endpoint :as invoices.insert]
    [playground.services.invoices.retrieve.endpoint :as invoices.retrieve]
    [playground.services.invoices.delete.endpoint :as invoices.delete]
-   [playground.services.invoices.retrieve-all.endpoint :as invoices.retrieve-all]))
+   [playground.services.invoices.retrieve-all.endpoint :as invoices.retrieve-all]
+   [playground.views :as views]
+   ))
 
-(defn about-page [request]
+#_(defn about-page [request]
   (->> (route/url-for ::about-page)
        (format "Clojure %s - served from %s"
                (clojure-version))
        ring-resp/response))
 
+(defn about-page [request]
+  (ring-resp/response (views/about)))
+
 (defn home-page [request]
-  (ring-resp/response "Hello World!"))
+  (ring-resp/response (views/home)))
+
+(defn all-invoices-page [request]
+  (ring-resp/response (views/all-invoices request)))
+
+(defn invoice-page [request]
+  (ring-resp/response (views/invoice request)))
 
 (spec/def ::temperature int?)
 
@@ -78,8 +89,8 @@
     ;;to (def routes (io.pedestal.http.route.definition.table/table-routes ...))
     ;;as "/invoices/:id" is conflicting with "/invoices/insert"
     ["/invoices-insert" :get (into component-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :query-params) `invoices.insert/perform])]
-    ["/invoices/:id" :get (into component-interceptors [http/json-body (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoices.retrieve/perform])]
-    ["/invoices" :get (into component-interceptors [http/json-body `invoices.retrieve-all/perform])]
+    ["/invoices/:id" :get (conj common-interceptors (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoice-page)]
+    ["/invoices" :get (conj common-interceptors `all-invoices-page)]
     ["/invoices/delete" :get (into component-interceptors [http/json-body `invoices.delete/perform])]
     })
 

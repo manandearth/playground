@@ -15,9 +15,5 @@
   (let [db     (->> db :pool (hash-map :datasource))
         all-records (->> (logic/query-all)
                          (h/format)
-                         (jdbc/query db))
-        ]
-    (if all-records
-      {:status 200
-       :body  all-records}
-      {:status 404})))
+                         (jdbc/query db))]
+    all-records))
