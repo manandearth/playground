@@ -12,7 +12,8 @@
    [playground.jobs.sample]
    [playground.services.invoices.insert.endpoint :as invoices.insert]
    [playground.services.invoices.retrieve.endpoint :as invoices.retrieve]
-   [playground.services.invoices.delete.endpoint :as invoices.delete]))
+   [playground.services.invoices.delete.endpoint :as invoices.delete]
+   [playground.services.invoices.retrieve-all.endpoint :as invoices.retrieve-all]))
 
 (defn about-page [request]
   (->> (route/url-for ::about-page)
@@ -78,7 +79,7 @@
     ;;as "/invoices/:id" is conflicting with "/invoices/insert"
     ["/invoices-insert" :get (into component-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :query-params) `invoices.insert/perform])]
     ["/invoices/:id" :get (into component-interceptors [http/json-body (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoices.retrieve/perform])]
-
+    ["/invoices" :get (into component-interceptors [http/json-body `invoices.retrieve-all/perform])]
     ["/invoices/delete" :get (into component-interceptors [http/json-body `invoices.delete/perform])]
     })
 
