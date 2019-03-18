@@ -17,12 +17,6 @@
    [playground.views :as views]
    ))
 
-#_(defn about-page [request]
-  (->> (route/url-for ::about-page)
-       (format "Clojure %s - served from %s"
-               (clojure-version))
-       ring-resp/response))
-
 (defn about-page [request]
   (ring-resp/response (views/about)))
 
@@ -30,10 +24,14 @@
   (ring-resp/response (views/home)))
 
 (defn all-invoices-page [request]
-  (ring-resp/response (views/all-invoices request)))
+  (ring-resp/response (views/all-invoices (invoices.retrieve-all/perform request))))
 
 (defn invoice-page [request]
-  (ring-resp/response (views/invoice request)))
+  (let [req (invoices.retrieve/perform request)]
+    (if req
+      (ring-resp/response (views/invoice req))
+      (ring-resp/not-found "Entry not in DB")
+      )))
 
 (spec/def ::temperature int?)
 

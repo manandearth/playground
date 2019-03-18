@@ -49,7 +49,7 @@
                          [:a {:href (str "/invoices/" v)} v]
                          v))}]
        (table/to-table1d
-        (retrieve-all/perform context)
+         context
         [:id "ID" :email "Email"]
         attr-fns))]]))
 
@@ -59,4 +59,4 @@
    header-links
    [:div
     [:h1 "Invoice"]
-    [:p (str (retrieve/perform context))]]))
+    [:p (str context)]]))
