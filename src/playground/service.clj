@@ -33,6 +33,12 @@
       (ring-resp/not-found "Entry not in DB")
       )))
 
+(defn insert-page [request]
+  (ring-resp/response (views/insert)))
+
+(defn insert-test [request]
+  (ring-resp/response request))
+
 (spec/def ::temperature int?)
 
 (spec/def ::orientation (spec/and keyword? #{:north :south :east :west}))
@@ -86,7 +92,8 @@
     ;;FIXME change the routes definition format from: (def routes #{...})
     ;;to (def routes (io.pedestal.http.route.definition.table/table-routes ...))
     ;;as "/invoices/:id" is conflicting with "/invoices/insert"
-    ["/invoices-insert" :get (into component-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :query-params) `invoices.insert/perform])]
+    ["/invoices-insert" :get (conj common-interceptors `insert-page)]
+    ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :params) `invoices.insert/perform])]
     ["/invoices/:id" :get (conj common-interceptors (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoice-page)]
     ["/invoices" :get (conj common-interceptors `all-invoices-page)]
     ["/invoices/delete" :get (into component-interceptors [http/json-body `invoices.delete/perform])]
