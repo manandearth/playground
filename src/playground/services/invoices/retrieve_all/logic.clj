@@ -2,4 +2,5 @@
 
 (defn query-all []
   {:select [:*]
-   :from [:users]})
+   :from   [:users]
+   :limit  100})

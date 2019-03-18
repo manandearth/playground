@@ -60,3 +60,15 @@
    [:div
     [:h1 "Invoice"]
     [:p (str user)]]))
+
+
+(defn insert []
+  (page/html5
+   (gen-page-head "Add an entry")
+    header-links
+    [:div
+     [:h1 "Add an entry to the DB"]
+     [:form {:action "/invoices-insert" :method "POST"}
+      [:div
+       [:p [:label "amount: " [:input {:type "text" :name "amount"}]]]
+       [:p [:label "λ ->" [:input {:type "submit" :value "Submit"}]]]]]]))
