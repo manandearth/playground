@@ -70,5 +70,5 @@
      [:h1 "Add an entry to the DB"]
      [:form {:action "/invoices-insert" :method "POST"}
       [:div
-       [:p [:label.justify "amount: " [:input {:type "text" :name "amount"}]]]
-       [:p [:label.justify "λ ->" [:input {:type "submit" :value "Submit"}]]]]]]))
+       [:p [:label "amount: " [:input {:type "text" :name "amount"}]]]
+       [:p [:label "λ ->" [:input {:type "submit" :value "Submit"}]]]]]]))

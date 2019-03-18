@@ -36,9 +36,6 @@
 (defn insert-page [request]
   (ring-resp/response (views/insert)))
 
-(defn insert-test [request]
-  (ring-resp/response request))
-
 (spec/def ::temperature int?)
 
 (spec/def ::orientation (spec/and keyword? #{:north :south :east :west}))
