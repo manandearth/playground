@@ -9,7 +9,7 @@
 
 (spec/def ::api (spec/keys :req-un [::amount]))
 
-(defn perform [{{:keys [amount]} :params :keys [db] :as request}]
+(defn perform [{{:keys [amount]} :form-params :keys [db] :as request}]
   (let [db     (->> db :pool (hash-map :datasource))
         insert (-> (logic/to-insert amount (java.util.UUID/randomUUID))
                    (h/format))
@@ -19,4 +19,3 @@
                    (logic/to-serialize))]
     {:status 200
      :body   result}))
-

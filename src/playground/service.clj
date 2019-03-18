@@ -1,21 +1,20 @@
 (ns playground.service
   (:require
-   [clojure.core.async :as async :refer [go >!]]
+   [clojure.core.async :as async :refer [>! go]]
    [clojure.spec.alpha :as spec]
    [com.grzm.component.pedestal :as pedestal-component]
    [io.pedestal.http :as http]
-   [io.pedestal.http.route :as route]
    [io.pedestal.http.body-params :as body-params]
+   [io.pedestal.http.route :as route]
    [io.pedestal.interceptor.chain :as interceptor-chain]
-   [ring.util.response :as ring-resp]
    [playground.coerce :as coerce]
    [playground.jobs.sample]
-   [playground.services.invoices.insert.endpoint :as invoices.insert]
-   [playground.services.invoices.retrieve.endpoint :as invoices.retrieve]
    [playground.services.invoices.delete.endpoint :as invoices.delete]
+   [playground.services.invoices.insert.endpoint :as invoices.insert]
    [playground.services.invoices.retrieve-all.endpoint :as invoices.retrieve-all]
+   [playground.services.invoices.retrieve.endpoint :as invoices.retrieve]
    [playground.views :as views]
-   ))
+   [ring.util.response :as ring-resp]))
 
 (defn about-page [request]
   (ring-resp/response (views/about)))
@@ -30,8 +29,7 @@
   (let [user (invoices.retrieve/perform request)]
     (if user
       (ring-resp/response (views/invoice user))
-      (ring-resp/not-found "Entry not in DB")
-      )))
+      (ring-resp/not-found "Entry not in DB"))))
 
 (defn insert-page [request]
   (ring-resp/response (views/insert)))
@@ -44,11 +42,9 @@
 
 (defn api [{{:keys [temperature orientation]} :query-params :keys [db] :as request}]
   #_(go
-    (-> enqueuer :channel (>! (playground.jobs.sample/new temperature))))
+      (-> enqueuer :channel (>! (playground.jobs.sample/new temperature))))
   {:status 200
    :body   {:temperature temperature :orientation orientation}})
-
-
 
 (defn param-spec-interceptor
   "Coerces params according to a spec. If invalid, aborts the interceptor-chain with 422, explaining the issue."
@@ -72,8 +68,7 @@
    :name  ::context-injector})
 
 (def components-to-inject [:db
-                           #_:background-processor #_:enqueuer
-                           ])
+                           #_:background-processor #_:enqueuer])
 
 (def component-interceptors
   (conj (mapv pedestal-component/using-component components-to-inject)
@@ -90,11 +85,10 @@
     ;;to (def routes (io.pedestal.http.route.definition.table/table-routes ...))
     ;;as "/invoices/:id" is conflicting with "/invoices/insert"
     ["/invoices-insert" :get (conj common-interceptors `insert-page)]
-    ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :params) `invoices.insert/perform])]
+    ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
     ["/invoices/:id" :get (conj common-interceptors (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoice-page)]
     ["/invoices" :get (conj common-interceptors `all-invoices-page)]
-    ["/invoices/delete" :get (into component-interceptors [http/json-body `invoices.delete/perform])]
-    })
+    ["/invoices/delete" :get (into component-interceptors [http/json-body `invoices.delete/perform])]})
 
 (comment
   (def routes
@@ -149,4 +143,3 @@
                              ;; :key-password "password"
                              ;; :ssl-port 8443
                              :ssl? false}})
-
