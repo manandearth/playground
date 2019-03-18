@@ -22,13 +22,24 @@
    [playground.server]
    [playground.service]))
 
+;; ugly hack, will disappear when we use the newer project template
+(def vemv? (-> (System/getenv "USER") #{"vemv"}))
+
 (defn dev-system
   []
   (component/system-map
    :service-map playground.server/dev-map
    ;; :background-processor (background-processor/new :queue-name "cljtest")
    ;; :enqueuer (enqueuer/new :queue-name "cljtest")
-   :db (modular.postgres/map->Postgres {:url "jdbc:postgresql:postgres" :user "postgres" :password "postgres"})
+   :db (modular.postgres/map->Postgres {:url (if vemv?
+                                               "jdbc:postgresql:ebdb"
+                                               "jdbc:postgresql:postgres")
+                                        :user (if vemv?
+                                                "root"
+                                                "postgres")
+                                        :password (if vemv?
+                                                    ""
+                                                    "postgres")})
    :pedestal (component/using (pedestal-component/pedestal (constantly playground.server/dev-map))
                               playground.service/components-to-inject)))
 
