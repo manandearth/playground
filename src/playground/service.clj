@@ -27,9 +27,9 @@
   (ring-resp/response (views/all-invoices (invoices.retrieve-all/perform request))))
 
 (defn invoice-page [request]
-  (let [req (invoices.retrieve/perform request)]
-    (if req
-      (ring-resp/response (views/invoice req))
+  (let [user (invoices.retrieve/perform request)]
+    (if user
+      (ring-resp/response (views/invoice user))
       (ring-resp/not-found "Entry not in DB")
       )))
 

@@ -53,10 +53,10 @@
         [:id "ID" :email "Email"]
         attr-fns))]]))
 
-(defn invoice [context]
+(defn invoice [user]
   (page/html5
    (gen-page-head "Invoice")
    header-links
    [:div
     [:h1 "Invoice"]
-    [:p (str context)]]))
+    [:p (str user)]]))
