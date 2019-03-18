@@ -20,9 +20,5 @@
         record (->> (logic/to-query id)
                     (h/format)
                     (jdbc/query db)
-                    (first))
-        ]
-    (if record
-      {:status 200
-       :body   record}
-      {:status 404})))
+                    (first))]
+    record))
