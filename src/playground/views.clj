@@ -68,7 +68,7 @@
        [:p [:label "amount: " [:input {:type "text" :name "amount" :value (first (clojure.string/split (:email user) #"@"))}]]]
        [:p [:label "λ ->" [:input {:type "submit" :value "Update"}]]]]]]))
 
-(defn update-submit-invoice [context]
+(defn submit-invoice [context]
   (page/html5
    (gen-page-head "All Entries")
    header-links
