@@ -3,9 +3,9 @@
    [honeysql.core :as h]
    [honeysql.helpers :as hh]))
 
-(defn to-update [id amount uuid]
+(defn to-update [id name uuid]
   (-> (hh/update :users)
-      (hh/sset  {:email (str amount "@" uuid ".com")})
+      (hh/sset  {:email (str name "@" uuid ".com")})
       (hh/where [:= :id (Integer/parseInt id)])))
 
 (def to-query
