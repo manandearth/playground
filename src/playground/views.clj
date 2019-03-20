@@ -63,7 +63,7 @@
     [:h1 (str "Update entry id: " (:id user))]
      [:form {:action "/invoices-update" :method "POST"}
       [:div
-       [:p [:label "id: " [:input {:type "text" :name "id" :value (:id user)}]]]
+       [:p [:label "id: " [:input {:type "hidden" :name "id" :value (:id user)}]] [:span (:id user)]]
        [:p [:label "amount: " [:input {:type "text" :name "amount" :value (first (clojure.string/split (:email user) #"@"))}]]]
        [:p [:label "λ ->" [:input {:type "submit" :value "Update"}]]]]]]))
 

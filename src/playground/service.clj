@@ -87,7 +87,7 @@
     ;;as "/invoices/:id" is conflicting with "/invoices/insert"
     ["/invoices-insert" :get (conj common-interceptors `insert-page)]
     ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
-    ["/invoices-update" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.update/perform])]
+    ["/invoices-update" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
     ["/invoices/:id" :get (conj common-interceptors (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoice-page)]
     ["/invoices" :get (conj common-interceptors `all-invoices-page)]
     ["/invoices/delete" :get (into component-interceptors [http/json-body `invoices.delete/perform])]})
