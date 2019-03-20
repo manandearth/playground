@@ -3,7 +3,8 @@
    [hiccup.page :as page]
    [hiccup.table :as table]
    [playground.services.invoices.retrieve-all.endpoint :as retrieve-all]
-   [playground.services.invoices.retrieve.endpoint :as retrieve]))
+   [playground.services.invoices.retrieve.endpoint :as retrieve]
+   [playground.services.invoices.update.endpoint :as invoices.update]))
 
 (defn gen-page-head
   [title]
@@ -55,7 +56,7 @@
         [:id "ID" :email "Email"]
         attr-fns))]]))
 
-(defn invoice [user]
+(defn update-invoice [user]
   (page/html5
    (gen-page-head "Invoice")
    header-links
@@ -66,6 +67,24 @@
        [:p [:label "id: " [:input {:type "hidden" :name "id" :value (:id user)}]] [:span (:id user)]]
        [:p [:label "amount: " [:input {:type "text" :name "amount" :value (first (clojure.string/split (:email user) #"@"))}]]]
        [:p [:label "λ ->" [:input {:type "submit" :value "Update"}]]]]]]))
+
+(defn update-submit-invoice [context]
+  (page/html5
+   (gen-page-head "All Entries")
+   header-links
+   [:div
+    [:h2 (:confirmation context)]
+    [:h1 "All Entries"]
+    [:div
+     (let [attr-fns {:data-value-transform
+                     (fn [label-key v]
+                       (if (= :id label-key)
+                         [:a {:href (str "/invoices/" v)} v]
+                         v))}]
+       (table/to-table1d
+        (:result context)
+        [:id "ID" :email "Email"]
+        attr-fns))]]))
 
 (defn insert []
   (page/html5

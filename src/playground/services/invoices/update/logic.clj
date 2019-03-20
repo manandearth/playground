@@ -1,9 +1,7 @@
 (ns playground.services.invoices.update.logic
   (:require
    [honeysql.core :as h]
-   [honeysql.helpers :as hh]
-   [honeysql.types :as ht]
-   ))
+   [honeysql.helpers :as hh]))
 
 (defn to-update [id amount uuid]
   (-> (hh/update :users)
