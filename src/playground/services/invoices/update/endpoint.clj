@@ -14,7 +14,7 @@
 
 (defn perform [{{:keys [name]} :form-params {:keys [id]} :path-params :keys [db] :as request}]
   (let [db     (->> db :pool (hash-map :datasource))
-        update (-> (logic/to-update id name (java.util.UUID/randomUUID))
+        update (-> (logic/to-update (Integer/parseInt id) name (java.util.UUID/randomUUID))
                    (h/format))
         fetch  (h/format (retrieve-all.logic/query-all))
         _      (jdbc/execute! db update)

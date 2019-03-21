@@ -6,7 +6,7 @@
 (defn to-update [id name uuid]
   (-> (hh/update :users)
       (hh/sset  {:email (str name "@" uuid ".com")})
-      (hh/where [:= :id (Integer/parseInt id)])))
+      (hh/where [:= :id id])))
 
 (def to-query
   {:select   [:id :email]
