@@ -81,7 +81,7 @@
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
     ["/invoices/:id" :get (conj common-interceptors (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoices.retrieve/perform)]
     ["/invoices" :get (conj common-interceptors `invoices.retrieve-all/perform)]
-    ["/invoices/delete" :get (into component-interceptors [http/json-body `invoices.delete/perform])]})
+    ["/invoices-delete" :get (into component-interceptors [http/json-body `invoices.delete/perform])]})
 
 (comment
   (def routes
