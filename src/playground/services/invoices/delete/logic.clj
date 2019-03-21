@@ -2,11 +2,10 @@
   (:require
    [honeysql.helpers :as hh]))
 
-(defn to-delete []
+(defn to-delete [id]
   {:delete-from :users
-   :where       [:in :id {:select [:id]
-                          :from   [:users]
-                          :limit  1}]})
+   :where [:= :id id]})
+
 
 (defn to-serialize []
   {:select [:%count.*]
