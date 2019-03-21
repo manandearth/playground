@@ -4,7 +4,8 @@
    [clojure.java.jdbc :as jdbc]
    [clojure.spec.alpha :as spec]
    [honeysql.core :as h]
-   [playground.services.invoices.retrieve.logic :as logic])
+   [playground.services.invoices.retrieve.logic :as logic]
+   [playground.services.invoices.retrieve.view :as view])
   (:import
    [org.postgresql.jdbc4 Jdbc4Array]))
 
@@ -21,4 +22,6 @@
                     (h/format)
                     (jdbc/query db)
                     (first))]
-    record))
+    (if record
+      {:status 200 :body (view/update-invoice record)}
+      {:status 404 :body "Entry not in DB"})))

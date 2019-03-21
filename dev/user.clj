@@ -16,7 +16,7 @@
    [com.grzm.component.pedestal :as pedestal-component]
    [com.stuartsierra.component :as component]
    [com.stuartsierra.component.repl :refer [reset set-init]]
-   [formatting-stack.component]
+   ;[formatting-stack.component]
    [modular.postgres]
    [playground.server]
    #_ [background-processing.background-processor :as background-processor]
@@ -43,7 +43,8 @@
                                                     "postgres")})
    :pedestal (component/using (pedestal-component/pedestal (constantly playground.server/dev-map))
                               playground.service/components-to-inject)
-   :formatting-stack (formatting-stack.component/map->Formatter {})))
+   ;:formatting-stack (formatting-stack.component/map->Formatter {})
+   ))
 
 (set-init (fn [_]
             (dev-system)))
