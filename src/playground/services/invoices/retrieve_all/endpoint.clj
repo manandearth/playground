@@ -2,9 +2,9 @@
   (:require
    [cheshire.generate]
    [clojure.java.jdbc :as jdbc]
-   [clojure.spec.alpha :as spec]
    [honeysql.core :as h]
-   [playground.services.invoices.retrieve-all.logic :as logic])
+   [playground.services.invoices.retrieve-all.logic :as logic]
+   [playground.views :as views])
   (:import
    [org.postgresql.jdbc4 Jdbc4Array]))
 
@@ -16,4 +16,4 @@
         all-records (->> (logic/query-all)
                          (h/format)
                          (jdbc/query db))]
-    all-records))
+    {:status 200 :body (views/all-invoices all-records)}))

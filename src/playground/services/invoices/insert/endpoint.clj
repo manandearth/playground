@@ -4,7 +4,8 @@
    [clojure.spec.alpha :as spec]
    [honeysql.core :as h]
    [playground.services.invoices.insert.logic :as logic]
-   [playground.services.invoices.retrieve-all.logic :as retrieve-all.logic]))
+   [playground.services.invoices.retrieve-all.logic :as retrieve-all.logic]
+   [playground.views :as views]))
 
 (spec/def ::amount nat-int?)
 
@@ -19,5 +20,8 @@
         _      (jdbc/execute! db insert)
         result (-> (jdbc/query db fetch)
                    (logic/to-serialize))
-        result-all (-> (jdbc/query db fetch-all))]
-    {:result result-all :confirmation (str "The entry " (:id result) " has been inserted.")}))
+        result-all (-> (jdbc/query db fetch-all))
+        result-map {:result result-all
+                    :confirmation (str "The entry " (:id result) " has been inserted.")}]
+
+    {:status 200 :body (views/submit-invoice result-map)}))

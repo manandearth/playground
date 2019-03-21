@@ -1,10 +1,7 @@
 (ns playground.views
   (:require
    [hiccup.page :as page]
-   [hiccup.table :as table]
-   [playground.services.invoices.retrieve-all.endpoint :as retrieve-all]
-   [playground.services.invoices.retrieve.endpoint :as retrieve]
-   [playground.services.invoices.update.endpoint :as invoices.update]))
+   [hiccup.table :as table]))
 
 (defn gen-page-head
   [title]

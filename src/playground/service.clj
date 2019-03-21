@@ -23,23 +23,14 @@
 (defn home-page [request]
   (ring-resp/response (views/home)))
 
-(defn all-invoices-page [request]
-  (ring-resp/response (views/all-invoices (invoices.retrieve-all/perform request))))
-
 (defn update-page [request]
   (let [user (invoices.retrieve/perform request)]
     (if user
       (ring-resp/response (views/update-invoice user))
       (ring-resp/not-found "Entry not in DB"))))
 
-(defn update-submit-page [request]
-  (ring-resp/response (views/submit-invoice (invoices.update/perform request))))
-
 (defn insert-page [request]
   (ring-resp/response (views/insert)))
-
-(defn insert-submit-page [request]
-  (ring-resp/response (views/submit-invoice (invoices.insert/perform request))))
 
 (spec/def ::temperature int?)
 
@@ -92,10 +83,10 @@
     ;;to (def routes (io.pedestal.http.route.definition.table/table-routes ...))
     ;;as "/invoices/:id" is conflicting with "/invoices/insert"
     ["/invoices-insert" :get (conj common-interceptors `insert-page)]
-    ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `insert-submit-page])]
-    ["/invoices-update" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `update-submit-page])]
+    ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
+    ["/invoices-update" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
     ["/invoices/:id" :get (conj common-interceptors (param-spec-interceptor ::invoices.retrieve/api :path-params) `update-page)]
-    ["/invoices" :get (conj common-interceptors `all-invoices-page)]
+    ["/invoices" :get (conj common-interceptors `invoices.retrieve-all/perform)]
     ["/invoices/delete" :get (into component-interceptors [http/json-body `invoices.delete/perform])]})
 
 (comment
