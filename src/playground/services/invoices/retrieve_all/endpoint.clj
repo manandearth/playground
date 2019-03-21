@@ -4,7 +4,7 @@
    [clojure.java.jdbc :as jdbc]
    [honeysql.core :as h]
    [playground.services.invoices.retrieve-all.logic :as logic]
-   [playground.views :as views])
+   [playground.services.invoices.retrieve-all.view :as view])
   (:import
    [org.postgresql.jdbc4 Jdbc4Array]))
 
@@ -16,4 +16,4 @@
         all-records (->> (logic/query-all)
                          (h/format)
                          (jdbc/query db))]
-    {:status 200 :body (views/all-invoices all-records)}))
+    {:status 200 :body (view/all-invoices all-records)}))

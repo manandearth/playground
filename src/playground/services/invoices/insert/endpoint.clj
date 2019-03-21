@@ -5,7 +5,7 @@
    [honeysql.core :as h]
    [playground.services.invoices.insert.logic :as logic]
    [playground.services.invoices.retrieve-all.logic :as retrieve-all.logic]
-   [playground.views :as views]))
+   [playground.services.invoices.insert.view :as view]))
 
 (spec/def ::amount nat-int?)
 
@@ -24,4 +24,4 @@
         result-map {:result result-all
                     :confirmation (str "The entry " (:id result) " has been inserted.")}]
 
-    {:status 200 :body (views/submit-invoice result-map)}))
+    {:status 200 :body (view/submit-invoice result-map)}))

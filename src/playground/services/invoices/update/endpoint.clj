@@ -5,7 +5,7 @@
    [honeysql.core :as h]
    [playground.services.invoices.update.logic :as logic]
    [playground.services.invoices.retrieve-all.logic :as retrieve-all.logic]
-   [playground.views :as views]
+   [playground.services.invoices.update.view :as view]
    [clojure.string :as string]))
 
 (spec/def ::name (spec/and string? (complement string/blank?)))
@@ -21,4 +21,4 @@
         result (jdbc/query db fetch)
         result-map {:result result :confirmation (str "The entry " id " has been updated.")}]
 
-    {:status 200 :body (views/submit-invoice result-map)}))
+    {:status 200 :body (view/submit-invoice result-map)}))
