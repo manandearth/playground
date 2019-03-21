@@ -12,7 +12,7 @@
 
 (spec/def ::api (spec/keys :req-un [::name]))
 
-(defn perform [{{:keys [id name]} :form-params :keys [db] :as request}]
+(defn perform [{{:keys [name]} :form-params {:keys [id]} :path-params :keys [db] :as request}]
   (let [db     (->> db :pool (hash-map :datasource))
         update (-> (logic/to-update id name (java.util.UUID/randomUUID))
                    (h/format))

@@ -59,7 +59,7 @@
    header-links
    [:div
     [:h1 (str "Update entry id: " (:id user))]
-     [:form {:action "/invoices-update" :method "POST"}
+    [:form {:action (str "/invoices-update/" (:id user)) :method "POST"}
       [:div
        [:p [:label "id: " [:input {:type "hidden" :name "id" :value (:id user)}]] [:span (:id user)]]
        [:p [:label "amount: " [:input {:type "text" :name "name" :value (first (clojure.string/split (:email user) #"@"))}]]]

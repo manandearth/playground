@@ -23,12 +23,6 @@
 (defn home-page [request]
   (ring-resp/response (views/home)))
 
-(defn update-page [request]
-  (let [user (invoices.retrieve/perform request)]
-    (if user
-      (ring-resp/response (views/update-invoice user))
-      (ring-resp/not-found "Entry not in DB"))))
-
 (defn insert-page [request]
   (ring-resp/response (views/insert)))
 
@@ -84,8 +78,8 @@
     ;;as "/invoices/:id" is conflicting with "/invoices/insert"
     ["/invoices-insert" :get (conj common-interceptors `insert-page)]
     ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
-    ["/invoices-update" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
-    ["/invoices/:id" :get (conj common-interceptors (param-spec-interceptor ::invoices.retrieve/api :path-params) `update-page)]
+    ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
+    ["/invoices/:id" :get (conj common-interceptors (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoices.retrieve/perform)]
     ["/invoices" :get (conj common-interceptors `invoices.retrieve-all/perform)]
     ["/invoices/delete" :get (into component-interceptors [http/json-body `invoices.delete/perform])]})
 
