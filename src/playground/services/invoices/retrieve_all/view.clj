@@ -15,8 +15,11 @@
                      (fn [label-key v]
                        (if (= :id label-key)
                          [:a {:href (str "/invoices/" v)} v]
-                         v))}]
+                         (if (= :delete label-key)
+                           [:a {:href (str "/invoices-delete/" v)} "delete"]
+                           v)))}
+           extended-context (map #(assoc % :delete (:id %)) context)]
        (table/to-table1d
-         context
-        [:id "ID" :email "Email"]
+        extended-context
+        [:id "ID" :email "Email" :delete "to-delete"]
         attr-fns))]]))
