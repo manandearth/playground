@@ -4,8 +4,7 @@
    [clojure.java.jdbc :as jdbc]
    [honeysql.core :as h]
    [playground.services.invoices.delete.logic :as logic]
-   [playground.services.invoices.retrieve-all.logic :as retrieve-all.logic]
-   [playground.services.invoices.delete.view :as view]))
+   [playground.services.invoices.retrieve-all.logic :as retrieve-all.logic]))
 
 (spec/def ::id nat-int?)
 
@@ -23,5 +22,4 @@
                     (first))
         result (jdbc/query db fetch)
         result-map {:result result :deleted id}]
-    {:status 200
-     :body (view/delete-invoice result-map)}))
+    {:status 302 :headers {"Location" "/invoices"} :body ""}))
