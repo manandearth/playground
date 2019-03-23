@@ -5,7 +5,6 @@
    [honeysql.core :as h]
    [playground.services.invoices.update.logic :as logic]
    [playground.services.invoices.retrieve-all.logic :as retrieve-all.logic]
-   [playground.services.invoices.update.view :as view]
    [clojure.string :as string]))
 
 (spec/def ::name (spec/and string? (complement string/blank?)))
@@ -16,9 +15,6 @@
   (let [db     (->> db :pool (hash-map :datasource))
         update (-> (logic/to-update (Integer/parseInt id) name (java.util.UUID/randomUUID))
                    (h/format))
-        fetch  (h/format (retrieve-all.logic/query-all))
-        _      (jdbc/execute! db update)
-        result (jdbc/query db fetch)
-        result-map {:result result :confirmation (str "The entry " id " has been updated.")}]
+        _      (jdbc/execute! db update)]
 
-    {:status 200 :body (view/submit-invoice result-map)}))
+    {:status 302 :headers {"Location" "/invoices"} :body ""}))
