@@ -10,8 +10,8 @@
    (views/gen-page-head "All Entries")
    views/header-links
    [:div
+    [:h2 info]
     [:h1 "All Entries"]
-    [:div [:h1 info]]
     [:div
      (let [attr-fns {:data-value-transform
                      (fn [label-key v]

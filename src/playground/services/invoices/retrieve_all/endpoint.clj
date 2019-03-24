@@ -11,9 +11,10 @@
 (cheshire.generate/add-encoder Jdbc4Array (fn [c json-generator]
                                             (-> c .getArray (cheshire.generate/encode-seq json-generator))))
 
-(defn perform [{{:keys [id]} :path-params {:keys [info]} :flash :keys [db] :as request}]
+(defn perform [{{:keys [id]} :path-params  :keys [db] {:keys [info]} :session  :as request}]
   (let [db     (->> db :pool (hash-map :datasource))
         all-records (->> (logic/query-all)
                          (h/format)
                          (jdbc/query db))]
-    {:status 200 :body (view/all-invoices all-records info)}))
+    {:status 200 :body (view/all-invoices all-records info)
+     }))

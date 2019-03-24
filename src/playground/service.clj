@@ -7,6 +7,7 @@
    [io.pedestal.http.body-params :as body-params]
    [io.pedestal.http.route :as route]
    [io.pedestal.interceptor.chain :as interceptor-chain]
+   [io.pedestal.http.ring-middlewares :as middlewares]
    [playground.coerce :as coerce]
    [playground.jobs.sample]
    [playground.services.invoices.delete.endpoint :as invoices.delete]
@@ -15,7 +16,8 @@
    [playground.services.invoices.retrieve.endpoint :as invoices.retrieve]
    [playground.services.invoices.update.endpoint :as invoices.update]
    [playground.views :as views]
-   [ring.util.response :as ring-resp]))
+   [ring.util.response :as ring-resp]
+   [ring.middleware.session.cookie :as cookie]))
 
 (defn about-page [request]
   (ring-resp/response (views/about)))
@@ -66,7 +68,10 @@
   (conj (mapv pedestal-component/using-component components-to-inject)
         (context-injector components-to-inject)))
 
-(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body]))
+(def session-interceptor (middlewares/session {:store (cookie/cookie-store)}))
+
+
+(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body session-interceptor]))
 
 (def routes
   "Tabular routes"
