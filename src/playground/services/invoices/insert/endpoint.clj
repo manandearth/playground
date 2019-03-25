@@ -15,4 +15,4 @@
                    (h/format))
         _      (jdbc/execute! db insert)
         ]
-    {:status 301 :headers {"Location" "/invoices"} :body "" :session {:info "Inserted to DB"}}))
+    {:status 301 :headers {"Location" "/invoices"} :body "" :flash "Inserted to DB"}))

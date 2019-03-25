@@ -22,4 +22,4 @@
                     (first))
         result (jdbc/query db fetch)
         result-map {:result result :deleted id}]
-    {:status 302 :headers {"Location" "/invoices"} :body "" :session {:info (str "Entry " id " has beed deleted.")}}))
+    {:status 302 :headers {"Location" "/invoices"} :body "" :flash (str "Entry " id " has beed deleted.")}))

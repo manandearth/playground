@@ -5,12 +5,12 @@
    [io.pedestal.http.route :refer [url-for]]
    [playground.views :as views]))
 
-(defn all-invoices [context & info]
+(defn all-invoices [context & flash]
   (page/html5
    (views/gen-page-head "All Entries")
    views/header-links
    [:div
-    [:h2 info]
+    (when (seq flash) [:h2 flash])
     [:h1 "All Entries"]
     [:div
      (let [attr-fns {:data-value-transform
