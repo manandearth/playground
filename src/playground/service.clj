@@ -29,6 +29,9 @@
 (defn insert-page [request]
   (ring-resp/response (views/insert)))
 
+(defn login-page [request]
+  (ring-resp/response (views/login)))
+
 (spec/def ::temperature int?)
 
 (spec/def ::orientation (spec/and keyword? #{:north :south :east :west}))
@@ -79,6 +82,7 @@
   "Tabular routes"
   #{["/" :get (conj common-interceptors `home-page)]
     ["/about" :get (conj common-interceptors `about-page)]
+    ["/login" :get (conj common-interceptors `login-page)]
     ["/api" :get (into component-interceptors [http/json-body (param-spec-interceptor ::api :query-params) `api])]
     ;;FIXME change the routes definition format from: (def routes #{...})
     ;;to (def routes (io.pedestal.http.route.definition.table/table-routes ...))

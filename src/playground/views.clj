@@ -18,6 +18,8 @@
    [:a {:href "/invoices-insert"} "Add an entry"]
    " | "
    [:a {:href "/invoices"} "All Entries"]
+   " | "
+   [:a {:href "/login"} "Login"]
    " ]"])
 
 (defn home []
@@ -46,3 +48,15 @@
       [:div
        [:p [:label "amount: " [:input {:type "text" :name "amount"}]]]
        [:p [:label "λ ->" [:input {:type "submit" :value "Submit"}]]]]]]))
+
+(defn login []
+  (page/html5
+   (gen-page-head "login")
+   header-links
+   [:div
+    [:h1 "Login"]
+    [:form {:action "/login" :method "POST"}
+     [:div
+      [:p [:label "User name: " [:input {:type "text" :name "user"}]]]
+      [:p [:label "Password: " [:input {:type "text" :name "pass"}]]]
+      [:p [:label "authenticate" [:input {:type "submit" :value "submit"}]]]]]]))
