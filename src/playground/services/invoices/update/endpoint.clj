@@ -17,4 +17,4 @@
                    (h/format))
         _      (jdbc/execute! db update)]
 
-    {:status 302 :headers {"Location" "/invoices"} :body ""}))
+    {:status 302 :headers {"Location" "/invoices"} :body "" :flash (str "Entry " id " has been updated.")}))

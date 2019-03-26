@@ -23,5 +23,5 @@
                     (jdbc/query db)
                     (first))]
     (if record
-      {:status 200 :body (view/update-invoice record)}
+      {:status 200 :body (view/update-invoice record) :session {:info (str "Entry " id " is updated.")}}
       {:status 404 :body "Entry not in DB"})))
