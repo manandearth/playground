@@ -57,6 +57,22 @@
     [:h1 "Login"]
     [:form {:action "/login" :method "POST"}
      [:div
-      [:p [:label "User name: " [:input {:type "text" :name "user"}]]]
-      [:p [:label "Password: " [:input {:type "text" :name "pass"}]]]
-      [:p [:label "authenticate" [:input {:type "submit" :value "submit"}]]]]]]))
+      [:p [:label "User name: " [:input {:type "text" :name "username"}]]]
+      [:p [:label "Password: " [:input {:type "text" :name "password"}]]]
+      [:p [:label "" [:input {:type "submit" :value "submit"}]]]
+      ]]
+    [:div  [:a {:href "/register"} "Register here"]]]))
+
+
+
+(defn register []
+  (page/html5
+   (gen-page-head "Register")
+   header-links
+   [:div
+    [:h1 "Register"]
+    [:form {:action "/register" :method "POST"}
+     [:div
+      [:p [:label "User name: " [:input {:type "text" :name "username"}]]]
+      [:p [:lable "Password: " [:input {:type "text" :name "password"}]]]
+      [:p [:label "" [:input {:type "submit" :value "submit"}]]]]]]))

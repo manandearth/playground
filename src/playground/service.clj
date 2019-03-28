@@ -16,6 +16,7 @@
    [playground.services.invoices.retrieve-all.endpoint :as invoices.retrieve-all]
    [playground.services.invoices.retrieve.endpoint :as invoices.retrieve]
    [playground.services.invoices.update.endpoint :as invoices.update]
+   [playground.services.session.register.endpoint :as session.register]
    [playground.views :as views]
    [ring.util.response :as ring-resp]
    [ring.middleware.session.cookie :as cookie]
@@ -30,7 +31,6 @@
    :vemv  {:display-name "Vemv"
            :password     "secret"}})
 
-
 (defn about-page [request]
   (ring-resp/response (views/about)))
 
@@ -44,16 +44,14 @@
        (str "Hello " (:display-name (get users (:identity identified-request))))
        (str "Hello anonymous, " request)))))
 
-
-(def request1 {:identity  :aaron})
-
-(:display-name (get users (:identity request1)))
-
 (defn insert-page [request]
   (ring-resp/response (views/insert)))
 
 (defn login-page [request]
   (ring-resp/response (views/login)))
+
+(defn register-page [request]
+  (ring-resp/response (views/register)))
 
 (spec/def ::temperature int?)
 
@@ -67,12 +65,11 @@
   {:status 200
    :body   {:temperature temperature :orientation orientation}})
 
-
-(def basic-auth-backend
-  (backends/basic
+(def session-auth-backend
+  (backends/session
    {:authfn (fn [request authdata]
               (let [{:keys [username password]} authdata
-                    known-user                  (get users (keyword username))]
+                    known-user                  (get users username)]
                 (when (= (:password known-user) password)
                   (keyword username))))}))
 
@@ -81,8 +78,7 @@
   (interceptor/interceptor
    {:name ::authenticate
     :enter (fn [ctx]
-             (update ctx :request authentication-request basic-auth-backend))}))
-
+             (update ctx :request authentication-request session-auth-backend))}))
 
 (defn param-spec-interceptor
   "Coerces params according to a spec. If invalid, aborts the interceptor-chain with 422, explaining the issue."
@@ -116,13 +112,15 @@
 
 (def flash-interceptor (ring-middlewares/flash))
 
-(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body session-interceptor flash-interceptor authentication-interceptor]))
+(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body authentication-interceptor session-interceptor flash-interceptor ]))
 
 (def routes
   "Tabular routes"
   #{["/" :get (conj common-interceptors `home-page)]
     ["/about" :get (conj common-interceptors `about-page)]
     ["/login" :get (conj common-interceptors `login-page)]
+    ["/register" :get (conj common-interceptors  `register-page)]
+    ["/register" :post (into common-interceptors [http/json-body `session.register/perform])]
     ["/api" :get (into component-interceptors [http/json-body (param-spec-interceptor ::api :query-params) `api])]
     ;;FIXME change the routes definition format from: (def routes #{...})
     ;;to (def routes (io.pedestal.http.route.definition.table/table-routes ...))
