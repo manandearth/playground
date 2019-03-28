@@ -6,7 +6,6 @@
 (defn submit-invoice [context]
   (page/html5
    (views/gen-page-head "All Entries")
-   views/header-links
    [:div
     [:h2 (:confirmation context)]
     [:h1 "All Entries"]

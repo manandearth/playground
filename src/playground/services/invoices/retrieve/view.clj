@@ -6,7 +6,6 @@
 (defn update-invoice [user]
   (page/html5
    (views/gen-page-head "Invoice")
-   views/header-links
    [:div
     [:h1 (str "Update entry id: " (:id user))]
     [:form {:action (str "/invoices-update/" (:id user)) :method "POST"}

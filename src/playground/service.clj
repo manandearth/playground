@@ -17,6 +17,7 @@
    [playground.services.invoices.retrieve.endpoint :as invoices.retrieve]
    [playground.services.invoices.update.endpoint :as invoices.update]
    [playground.services.session.register.endpoint :as session.register]
+   [playground.services.session.login.endoint :as session.login]
    [playground.views :as views]
    [ring.util.response :as ring-resp]
    [ring.middleware.session.cookie :as cookie]
@@ -37,12 +38,16 @@
 (defn home-page [request]
   (ring-resp/response (views/home)))
 
-(defn greet-page [request]
+#_(defn greet-page [request]
   (ring-resp/response
    (let [identified-request (assoc request :identity :adam)] 
      (if (authenticated? identified-request)
        (str "Hello " (:display-name (get users (:identity identified-request))))
        (str "Hello anonymous, " request)))))
+
+(defn greet-page [{:keys [session] :as request}]
+  (ring-resp/response
+   (views/greet (:identity session))))
 
 (defn insert-page [request]
   (ring-resp/response (views/insert)))
@@ -71,7 +76,7 @@
               (let [{:keys [username password]} authdata
                     known-user                  (get users username)]
                 (when (= (:password known-user) password)
-                  (keyword username))))}))
+                  username)))}))
 
 (def authentication-interceptor
   "Port of buddy-auth's wrap-authentication middleware."
@@ -119,6 +124,7 @@
   #{["/" :get (conj common-interceptors `home-page)]
     ["/about" :get (conj common-interceptors `about-page)]
     ["/login" :get (conj common-interceptors `login-page)]
+    ["/login" :post (into common-interceptors [http/json-body `session.login/login-authenticate])]
     ["/register" :get (conj common-interceptors  `register-page)]
     ["/register" :post (into common-interceptors [http/json-body `session.register/perform])]
     ["/api" :get (into component-interceptors [http/json-body (param-spec-interceptor ::api :query-params) `api])]

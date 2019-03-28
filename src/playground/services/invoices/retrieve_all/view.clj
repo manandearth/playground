@@ -8,7 +8,6 @@
 (defn all-invoices [context & flash]
   (page/html5
    (views/gen-page-head "All Entries")
-   views/header-links
    [:div
     (when (seq flash) [:h2 flash])
     [:h1 "All Entries"]
