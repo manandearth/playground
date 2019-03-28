@@ -3,7 +3,8 @@
    [hiccup.page :as page]
    [hiccup.table :as table]))
 
-(def header-links
+(defn header-links
+  [& username]
   [:div
    "[ "
    [:a {:href "/"} "Home"]
@@ -14,13 +15,17 @@
    " | "
    [:a {:href "/invoices"} "All Entries"]
    " | "
-   [:a {:href "/login"} "Login"]
+   (if username
+     [:div [:p "logged in as " username]
+      " | "
+      [:a {:href "/logout"} "Logout"]]
+     [:a {:href "/login"} "Login"])
    " ]"])
 
 (defn gen-page-head
   [title]
   [:head [:title title]]
-  header-links)
+  (header-links))
 
 (defn home []
   (page/html5
@@ -72,8 +77,9 @@
       [:p [:lable "Password: " [:input {:type "text" :name "password"}]]]
       [:p [:label "" [:input {:type "submit" :value "submit"}]]]]]]))
 
-(defn greet [identity]
+
+(defn greet [username]
   (page/html5
    (gen-page-head "greet")
    [:div
-    [:h2 (str  "welcome back, " identity ".")]]))
+    [:h2 (str "welcome back, " username ".")]]))

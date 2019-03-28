@@ -1,7 +1,14 @@
-(ns playground.services.session.login.endoint
+(ns playground.services.session.login.endpoint
   (:require [clojure.java.jdbc :as jdbc]
             [honeysql.core :as h]
+            [clojure.spec.alpha :as spec]
             [playground.services.session.login.logic :as logic]))
+
+
+(spec/def ::username (spec/and string? (spec/nilable not-empty)))
+(spec/def ::password (spec/and string? (spec/nilable not-empty)))
+(spec/def ::api (spec/keys :req-un [::username ::password]))
+
 
 (defn login-authenticate
   "Check request username and password against authdata

@@ -17,7 +17,7 @@
    [playground.services.invoices.retrieve.endpoint :as invoices.retrieve]
    [playground.services.invoices.update.endpoint :as invoices.update]
    [playground.services.session.register.endpoint :as session.register]
-   [playground.services.session.login.endoint :as session.login]
+   [playground.services.session.login.endpoint :as session.login]
    [playground.views :as views]
    [ring.util.response :as ring-resp]
    [ring.middleware.session.cookie :as cookie]
@@ -46,8 +46,10 @@
        (str "Hello anonymous, " request)))))
 
 (defn greet-page [{:keys [session] :as request}]
-  (ring-resp/response
-   (views/greet (:identity session))))
+  (if-let [username (:identity session)]
+    (ring-resp/response
+     (views/greet username))
+    {:status 301 :headers {"Location" "/login"} :body ""}))
 
 (defn insert-page [request]
   (ring-resp/response (views/insert)))
@@ -124,9 +126,9 @@
   #{["/" :get (conj common-interceptors `home-page)]
     ["/about" :get (conj common-interceptors `about-page)]
     ["/login" :get (conj common-interceptors `login-page)]
-    ["/login" :post (into common-interceptors [http/json-body `session.login/login-authenticate])]
+    ["/login" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.login/api :form-params) `session.login/login-authenticate])]
     ["/register" :get (conj common-interceptors  `register-page)]
-    ["/register" :post (into common-interceptors [http/json-body `session.register/perform])]
+    ["/register" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.register/api :form-params) `session.register/perform])]
     ["/api" :get (into component-interceptors [http/json-body (param-spec-interceptor ::api :query-params) `api])]
     ;;FIXME change the routes definition format from: (def routes #{...})
     ;;to (def routes (io.pedestal.http.route.definition.table/table-routes ...))
