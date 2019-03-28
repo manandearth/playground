@@ -60,6 +60,8 @@
 (defn register-page [request]
   (ring-resp/response (views/register)))
 
+(defn logout [request]
+  (assoc {:status 301 :headers {"Location" "/login"} :body ""} :session nil))
 (spec/def ::temperature int?)
 
 (spec/def ::orientation (spec/and keyword? #{:north :south :east :west}))
@@ -127,6 +129,7 @@
     ["/about" :get (conj common-interceptors `about-page)]
     ["/login" :get (conj common-interceptors `login-page)]
     ["/login" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.login/api :form-params) `session.login/login-authenticate])]
+    ["/logout" :get (conj common-interceptors `logout)]
     ["/register" :get (conj common-interceptors  `register-page)]
     ["/register" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.register/api :form-params) `session.register/perform])]
     ["/api" :get (into component-interceptors [http/json-body (param-spec-interceptor ::api :query-params) `api])]
