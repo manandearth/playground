@@ -7,6 +7,7 @@
    [io.pedestal.http.body-params :as body-params]
    [io.pedestal.http.route :as route]
    [io.pedestal.interceptor.chain :as interceptor-chain]
+   [io.pedestal.interceptor :as interceptor]
    [io.pedestal.http.ring-middlewares :as ring-middlewares]
    [playground.coerce :as coerce]
    [playground.jobs.sample]
@@ -18,13 +19,35 @@
    [playground.views :as views]
    [ring.util.response :as ring-resp]
    [ring.middleware.session.cookie :as cookie]
-   [ring.middleware.flash :as flash]))
+   [ring.middleware.flash :as flash]
+   [buddy.auth.middleware :refer [wrap-authentication authentication-request]]
+   [buddy.auth.backends :as backends]
+   [buddy.auth :refer [authenticated?]]))
+
+(def users
+  {:adam {:display-name "Adam"
+           :password     "secret"}
+   :vemv  {:display-name "Vemv"
+           :password     "secret"}})
+
 
 (defn about-page [request]
   (ring-resp/response (views/about)))
 
 (defn home-page [request]
   (ring-resp/response (views/home)))
+
+(defn greet-page [request]
+  (ring-resp/response
+   (let [identified-request (assoc request :identity :adam)] 
+     (if (authenticated? identified-request)
+       (str "Hello " (:display-name (get users (:identity identified-request))))
+       (str "Hello anonymous, " request)))))
+
+
+(def request1 {:identity  :aaron})
+
+(:display-name (get users (:identity request1)))
 
 (defn insert-page [request]
   (ring-resp/response (views/insert)))
@@ -43,6 +66,23 @@
       (-> enqueuer :channel (>! (playground.jobs.sample/new temperature))))
   {:status 200
    :body   {:temperature temperature :orientation orientation}})
+
+
+(def basic-auth-backend
+  (backends/basic
+   {:authfn (fn [request authdata]
+              (let [{:keys [username password]} authdata
+                    known-user                  (get users (keyword username))]
+                (when (= (:password known-user) password)
+                  (keyword username))))}))
+
+(def authentication-interceptor
+  "Port of buddy-auth's wrap-authentication middleware."
+  (interceptor/interceptor
+   {:name ::authenticate
+    :enter (fn [ctx]
+             (update ctx :request authentication-request basic-auth-backend))}))
+
 
 (defn param-spec-interceptor
   "Coerces params according to a spec. If invalid, aborts the interceptor-chain with 422, explaining the issue."
@@ -76,7 +116,7 @@
 
 (def flash-interceptor (ring-middlewares/flash))
 
-(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body session-interceptor flash-interceptor]))
+(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body session-interceptor flash-interceptor authentication-interceptor]))
 
 (def routes
   "Tabular routes"
@@ -87,6 +127,7 @@
     ;;FIXME change the routes definition format from: (def routes #{...})
     ;;to (def routes (io.pedestal.http.route.definition.table/table-routes ...))
     ;;as "/invoices/:id" is conflicting with "/invoices/insert"
+    ["/greet" :get (conj common-interceptors `greet-page)]
     ["/invoices-insert" :get (conj common-interceptors `insert-page)]
     ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
