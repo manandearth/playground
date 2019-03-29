@@ -51,9 +51,10 @@
        [:p [:label "amount: " [:input {:type "text" :name "amount"}]]]
        [:p [:label "λ ->" [:input {:type "submit" :value "Submit"}]]]]]]))
 
-(defn login []
+(defn login [{:keys [flash] :as request}]
   (page/html5
    (gen-page-head "login")
+   [:div (if flash [:h2 flash])]
    [:div
     [:h1 "Login"]
     [:form {:action "/login" :method "POST"}
@@ -78,8 +79,9 @@
       [:p [:label "" [:input {:type "submit" :value "submit"}]]]]]]))
 
 
-(defn greet [username]
+(defn greet [username & flash]
   (page/html5
    (gen-page-head "greet")
-   [:div
-    [:h2 (str "welcome back, " username ".")]]))
+   (if flash
+     [:div [:h2 flash]])
+   [:h2 (str "welcome back, " username ".")]))

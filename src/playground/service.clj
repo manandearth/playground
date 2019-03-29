@@ -38,30 +38,26 @@
 (defn home-page [request]
   (ring-resp/response (views/home)))
 
-#_(defn greet-page [request]
-  (ring-resp/response
-   (let [identified-request (assoc request :identity :adam)] 
-     (if (authenticated? identified-request)
-       (str "Hello " (:display-name (get users (:identity identified-request))))
-       (str "Hello anonymous, " request)))))
-
-(defn greet-page [{:keys [session] :as request}]
+(defn greet-page [{:keys [session flash] :as request}]
   (if-let [username (:identity session)]
     (ring-resp/response
-     (views/greet username))
+     (views/greet username flash))
     {:status 301 :headers {"Location" "/login"} :body ""}))
 
 (defn insert-page [request]
   (ring-resp/response (views/insert)))
 
 (defn login-page [request]
-  (ring-resp/response (views/login)))
+  (ring-resp/response (views/login request)))
 
 (defn register-page [request]
   (ring-resp/response (views/register)))
 
-(defn logout [request]
-  (assoc {:status 301 :headers {"Location" "/login"} :body ""} :session nil))
+(defn logout-handler [request]
+  (-> {:status 301 :headers {"Location" "/login"} :body ""}
+      (assoc :session {})
+      (assoc :flash "You are logged out")))
+
 (spec/def ::temperature int?)
 
 (spec/def ::orientation (spec/and keyword? #{:north :south :east :west}))
@@ -121,7 +117,7 @@
 
 (def flash-interceptor (ring-middlewares/flash))
 
-(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body authentication-interceptor session-interceptor flash-interceptor ]))
+(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body authentication-interceptor session-interceptor flash-interceptor]))
 
 (def routes
   "Tabular routes"
@@ -129,7 +125,7 @@
     ["/about" :get (conj common-interceptors `about-page)]
     ["/login" :get (conj common-interceptors `login-page)]
     ["/login" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.login/api :form-params) `session.login/login-authenticate])]
-    ["/logout" :get (conj common-interceptors `logout)]
+    ["/logout" :get (conj common-interceptors `logout-handler)]
     ["/register" :get (conj common-interceptors  `register-page)]
     ["/register" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.register/api :form-params) `session.register/perform])]
     ["/api" :get (into component-interceptors [http/json-body (param-spec-interceptor ::api :query-params) `api])]
