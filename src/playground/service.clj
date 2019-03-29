@@ -54,8 +54,8 @@
   (ring-resp/response (views/register)))
 
 (defn logout-handler [request]
-  (-> {:status 301 :headers {"Location" "/login"} :body ""}
-      (assoc :session {})
+  (-> (ring-resp/response "goodbye...")
+      (assoc :session nil)
       (assoc :flash "You are logged out")))
 
 (spec/def ::temperature int?)
@@ -125,7 +125,7 @@
     ["/about" :get (conj common-interceptors `about-page)]
     ["/login" :get (conj common-interceptors `login-page)]
     ["/login" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.login/api :form-params) `session.login/login-authenticate])]
-    ["/logout" :get (conj common-interceptors `logout-handler)]
+    ["/log-out" :get (conj common-interceptors `logout-handler)]
     ["/register" :get (conj common-interceptors  `register-page)]
     ["/register" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.register/api :form-params) `session.register/perform])]
     ["/api" :get (into component-interceptors [http/json-body (param-spec-interceptor ::api :query-params) `api])]
