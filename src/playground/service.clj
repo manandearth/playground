@@ -23,10 +23,10 @@
    [ring.middleware.session.cookie :as cookie]
    [ring.middleware.flash :as flash]
    [buddy.auth.middleware :refer [wrap-authentication authentication-request]]
-   [buddy.auth.backends :as backends]
+   [buddy.auth.backends.session :refer [session-backend]]
    [buddy.auth :refer [authenticated?]]))
 
-(def users
+#_(def users
   {:adam {:display-name "Adam"
            :password     "secret"}
    :vemv  {:display-name "Vemv"
@@ -54,8 +54,8 @@
   (ring-resp/response (views/register)))
 
 (defn logout-handler [request]
-  (-> (ring-resp/response "goodbye...")
-      (assoc :session nil)
+  (-> {:status 301 :headers {"Location" "/"} :body ""}
+      (assoc :session {})
       (assoc :flash "You are logged out")))
 
 (spec/def ::temperature int?)
@@ -71,11 +71,11 @@
    :body   {:temperature temperature :orientation orientation}})
 
 (def session-auth-backend
-  (backends/session
-   {:authfn (fn [request authdata]
-              (let [{:keys [username password]} authdata
-                    known-user                  (get users username)]
-                (when (= (:password known-user) password)
+  (session-backend
+   {:authfn (fn [request]
+              (let [{:keys [username password]} request
+                    known-user                  (get (session.login/all-usernames) username)]
+                (when (= (session.login/password-by-username username) password)
                   username)))}))
 
 (def authentication-interceptor
@@ -117,15 +117,15 @@
 
 (def flash-interceptor (ring-middlewares/flash))
 
-(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body authentication-interceptor session-interceptor flash-interceptor]))
+(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body authentication-interceptor  session-interceptor flash-interceptor]))
 
 (def routes
   "Tabular routes"
   #{["/" :get (conj common-interceptors `home-page)]
     ["/about" :get (conj common-interceptors `about-page)]
+    ["/log-out/now" :get (conj common-interceptors `logout-handler)]
     ["/login" :get (conj common-interceptors `login-page)]
     ["/login" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.login/api :form-params) `session.login/login-authenticate])]
-    ["/log-out" :get (conj common-interceptors `logout-handler)]
     ["/register" :get (conj common-interceptors  `register-page)]
     ["/register" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.register/api :form-params) `session.register/perform])]
     ["/api" :get (into component-interceptors [http/json-body (param-spec-interceptor ::api :query-params) `api])]
@@ -194,3 +194,4 @@
                              ;; :key-password "password"
                              ;; :ssl-port 8443
                              :ssl? false}})
+

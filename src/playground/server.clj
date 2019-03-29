@@ -45,3 +45,4 @@
     (when (and service (not (test? service-map)))
       (server/stop service))
     (dissoc this :service)))
+

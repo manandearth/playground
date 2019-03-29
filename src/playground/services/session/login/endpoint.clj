@@ -28,3 +28,15 @@
        :body ""
        :flash "Wrong username/password"
        })))
+
+(defn all-usernames [{:keys [db] :as request}]
+  (let [db (->> db :pool (hash-map :datasource))]
+    (->> (logic/query-all-usernames)
+         (h/format)
+         (jdbc/query db))))
+
+(defn password-by-username [{:keys [db] :as request} username]
+  (let [db (->> db :pool (hash-map :datasource))]
+    (->> (logic/query-pass-by-user username)
+         (h/format)
+         (jdbc/query db))))

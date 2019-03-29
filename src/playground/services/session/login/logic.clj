@@ -8,5 +8,13 @@
       (where  [:= :username username] [:= :password password])))
 
 
+(defn query-all-usernames []
+  (-> (select :username)
+      (from   :register)))
+
 ;(h/format (to-query "beam" "boom"))
 
+(defn query-pass-by-user [username]
+  (-> (select :password)
+      (from :register)
+      (where [:= :username username])))
