@@ -5,7 +5,9 @@
    [io.pedestal.http :as server]
    [io.pedestal.http.route :as route]
    [io.pedestal.http.route.definition.table :refer [table-routes]]
-   [playground.service :as service]))
+   [io.pedestal.test :refer [response-for]]
+   [playground.service :as service]
+   ))
 
 (def dev-map
   (-> service/service ;; start with production configuration

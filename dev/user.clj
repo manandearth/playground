@@ -18,6 +18,7 @@
    [com.stuartsierra.component.repl :refer [reset set-init system start stop]]
    ;[formatting-stack.component]
    [modular.postgres]
+   [io.pedestal.test :refer [response-for]]
    [playground.server]
    #_ [background-processing.background-processor :as background-processor]
    #_ [background-processing.enqueuer :as enqueuer]
