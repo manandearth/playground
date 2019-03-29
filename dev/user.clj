@@ -15,7 +15,7 @@
    [clojure.string :as string]
    [com.grzm.component.pedestal :as pedestal-component]
    [com.stuartsierra.component :as component]
-   [com.stuartsierra.component.repl :refer [reset set-init]]
+   [com.stuartsierra.component.repl :refer [reset set-init system start stop]]
    ;[formatting-stack.component]
    [modular.postgres]
    [playground.server]
