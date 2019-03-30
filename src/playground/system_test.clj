@@ -6,29 +6,28 @@
             [clojure.test :refer :all]
             [user]
             [playground.server]
-            [playground.service :as service]))
-
+            [playground.service]))
 
 (def url-for (route/url-for-routes
-              (route/expand-routes service/routes)))
+              (route/expand-routes playground.service/routes)))
 
 (defn service-fn
   [system]
-  (get-in system [:pedestal :service ::http/service-fn]))
-
-(defmacro with-system
-  [[bound-var binding-expr] & body]
-  `(let [~bound-var (component/start ~binding-expr)]
-     (try
-       ~@body
-       (finally
-         (component/stop ~bound-var)))))
+  (get-in system [:pedestal :server ::http/service-fn]))
 
 (deftest greeting-test
-  (with-system [sut (user/dev-system)]                       ;; <1>
-    (let [service               (service-fn sut)                 ;; <2>
-          {:keys [status body]} (response-for service
-                                              :get
-                                              (url-for :greet))] ;; <3>
-      (is (= 200 status))                                        ;; <4>
-      (is (= "Hello, world!" body)))))                           ;; <5>
+  (let [system com.stuartsierra.component.repl/system 
+        service (service-fn system)
+        {:keys [status body]} (response-for service
+                                            :get
+                                            (url-for :home))] 
+    (is (= 200 status))                                        
+    (is (= "<!DOCTYPE html>\n<html><head><title>Home</title></head><div>[ <a href=\"/\">Home</a> | <a href=\"/about\">About</a> | <a href=\"/invoices-insert\">Add an entry</a> | <a href=\"/invoices\">All Entries</a> ]</div><div><h1>Hello World!</h1></div></html>" body))))
+
+
+(defn comp-response-for [verb route]
+  (let [system com.stuartsierra.component.repl/system
+        service (service-fn system)]
+    (response-for service verb route)))
+
+;(comp-response-for :get "/")
