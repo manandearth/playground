@@ -1,12 +1,81 @@
 (ns playground.service-test
-  (:require
-   [clojure.test :refer :all]
-   [io.pedestal.test :refer :all]
-   [io.pedestal.http :as bootstrap]
-   [playground.service :as service]))
+  (:require [io.pedestal.http :as http]
+            [io.pedestal.http.route :as route]
+            [io.pedestal.test :refer [response-for]]
+            [io.pedestal.http.route.definition.table :refer [table-routes]]
+            [com.stuartsierra.component :as component]
+            [clojure.test :refer :all]
+            [user]
+            [playground.server]
+            [playground.service]))
 
-#_(def service
-  (::bootstrap/service-fn (bootstrap/create-servlet service/service)))
+(def url-for (route/url-for-routes
+              (route/expand-routes playground.service/routes)))
+
+(defn service-fn
+  [system]
+  (get-in system [:pedestal :server ::http/service-fn]))
+
+(deftest greeting-test
+  (let [system com.stuartsierra.component.repl/system 
+        service (service-fn system)
+        {:keys [status body]} (response-for service
+                                            :get
+                                            (url-for :home))] 
+    (is (= 200 status))                                        
+    (is (= "<!DOCTYPE html>\n<html><head><title>Home</title></head><div>[ <a href=\"/\">Home</a> | <a href=\"/about\">About</a> | <a href=\"/invoices-insert\">Add an entry</a> | <a href=\"/invoices\">All Entries</a> ]</div><div><h1>Hello World!</h1></div></html>" body))))
+
+(defn comp-response-for [verb route]
+  (let [system com.stuartsierra.component.repl/system
+        service (service-fn system)]
+    (response-for service verb route)))
+
+
+(defn print-routes
+  "Print our application's routes"
+  []
+  (route/print-routes (table-routes playground.service/routes)))
+
+(defn named-route
+  "Finds a route by name"
+  [route-name]
+  (->> playground.service/routes
+       table-routes
+       (filter #(= route-name (:route-name %)))
+       first))
+
+(defn print-route
+  "Prints a route and its interceptors"
+  [rname]
+  (letfn [(joined-by
+            [s coll]
+            (apply str (interpose s coll)))
+
+          (repeat-str
+            [s n]
+            (apply str (repeat n s)))
+
+          (interceptor-info
+            [i]
+            (let [iname  (or (:name i) "<handler>")
+                  stages (joined-by
+                          ","
+                          (keys
+                           (filter
+                            (comp (complement nil?) val)
+                            (dissoc i :name))))]
+              (str iname " (" stages ")")))]
+    (when-let [rte (named-route rname)]
+      (let [{:keys [path method route-name interceptors]} rte
+            name-line (str "[" method " " path " " route-name "]")]
+        (joined-by
+         "\n"
+         (into [name-line (repeat-str "-" (count name-line))]
+               (map interceptor-info interceptors)))))))
+
+
+
+
 
 #_(deftest home-page-test
   (is (= (-> service (response-for :get "/") :body)
