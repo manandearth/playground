@@ -46,3 +46,15 @@
       [:div
        [:p [:label "amount: " [:input {:type "text" :name "amount"}]]]
        [:p [:label "λ ->" [:input {:type "submit" :value "Submit"}]]]]]]))
+
+(defn register []
+  (page/html5
+   (gen-page-head "Register")
+   [:div
+    [:h1 "Register"]
+    [:form {:action "/register" :method "POST"}
+     [:div
+      [:p [:label "User name: " [:input {:type "text" :name "username"}]]]
+      [:p [:lable "Password: " [:input {:type "text" :name "password"}]]]
+      [:p [:label "" [:input {:type "submit" :value "submit"}]]]]]]))
+

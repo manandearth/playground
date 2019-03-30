@@ -29,6 +29,9 @@
 (defn insert-page [request]
   (ring-resp/response (views/insert)))
 
+(defn register-page [request]
+  (ring-resp/response (views/register)))
+
 (spec/def ::temperature int?)
 
 (spec/def ::orientation (spec/and keyword? #{:north :south :east :west}))
@@ -83,6 +86,7 @@
     ;;FIXME change the routes definition format from: (def routes #{...})
     ;;to (def routes (io.pedestal.http.route.definition.table/table-routes ...))
     ;;as "/invoices/:id" is conflicting with "/invoices/insert"
+    ["/register" :get (conj common-interceptors `register-page)]
     ["/invoices-insert" :get (conj common-interceptors `insert-page)]
     ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
