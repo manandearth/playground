@@ -33,6 +33,9 @@
 (defn register-page [request]
   (ring-resp/response (views/register request)))
 
+(defn login-page [request]
+  (ring-resp/response (views/login request)))
+
 (spec/def ::temperature int?)
 
 (spec/def ::orientation (spec/and keyword? #{:north :south :east :west}))
@@ -89,6 +92,7 @@
     ;;as "/invoices/:id" is conflicting with "/invoices/insert"
     ["/register" :get (conj common-interceptors `register-page)]
     ["/register" :post (conj common-interceptors `session.register/perform)]
+    ["/login" :get (conj common-interceptors `login-page)]
     ["/invoices-insert" :get (conj common-interceptors `insert-page)]
     ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
