@@ -47,9 +47,10 @@
        [:p [:label "amount: " [:input {:type "text" :name "amount"}]]]
        [:p [:label "λ ->" [:input {:type "submit" :value "Submit"}]]]]]]))
 
-(defn register []
+(defn register [{:keys [flash] :as request}]
   (page/html5
    (gen-page-head "Register")
+[:div (when (seq flash) [:h2 flash])]
    [:div
     [:h1 "Register"]
     [:form {:action "/register" :method "POST"}

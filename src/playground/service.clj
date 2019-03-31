@@ -31,7 +31,7 @@
   (ring-resp/response (views/insert)))
 
 (defn register-page [request]
-  (ring-resp/response (views/register)))
+  (ring-resp/response (views/register request)))
 
 (spec/def ::temperature int?)
 

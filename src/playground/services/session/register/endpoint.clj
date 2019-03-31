@@ -12,8 +12,19 @@
 
 (defn perform  [{{:keys [username password]} :form-params :keys [db] :as request}]
   (let [db     (->> db :pool (hash-map :datasource))
+        query (-> (logic/to-check username)
+                  (h/format))
+        check (jdbc/query db query)
         insert (-> (logic/to-insert username password)
-                   (h/format))
-        _      (jdbc/execute! db insert)
-        ] 
-    {:status 301 :headers {"Location" "/" } :body ""}))
+                   (h/format))]
+    (if (empty? check)
+      (do (jdbc/execute! db insert)
+          {:status 301 :headers {"Location" "/" } :body ""})
+      {:status 301 :headers {"Location" "/register"} :body "" :flash "username already taken, choose another"})
+    
+    ))
+
+
+
+#_(if-not true (-> (logic/to-insert "toto" "1232")
+                 (h/format)))
