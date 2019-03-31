@@ -6,6 +6,7 @@
    [io.pedestal.http :as http]
    [io.pedestal.http.body-params :as body-params]
    [io.pedestal.http.route :as route]
+   [io.pedestal.interceptor :as interceptor]
    [io.pedestal.interceptor.chain :as interceptor-chain]
    [io.pedestal.http.ring-middlewares :as ring-middlewares]
    [playground.coerce :as coerce]
@@ -16,10 +17,13 @@
    [playground.services.invoices.retrieve.endpoint :as invoices.retrieve]
    [playground.services.invoices.update.endpoint :as invoices.update]
    [playground.services.session.register.endpoint :as session.register]
+   [playground.services.session.login.endpoint :as session.login]
    [playground.views :as views]
    [ring.util.response :as ring-resp]
    [ring.middleware.session.cookie :as cookie]
-   [ring.middleware.flash :as flash]))
+   [ring.middleware.flash :as flash]
+   [buddy.auth.middleware :refer [authentication-request]]
+   [buddy.auth.backends.session :refer [session-backend]]))
 
 (defn about-page [request]
   (ring-resp/response (views/about)))
@@ -48,6 +52,25 @@
   {:status 200
    :body   {:temperature temperature :orientation orientation}})
 
+;;auth interceptors
+
+(def session-auth-backend
+  (session-backend
+   {:authfn (fn [request]
+              (let [{:keys [username password]} request
+                    known-user                  (get (session.login/all-usernames) username)]
+                (when (= (session.login/password-by-username username) password)
+                  username)))}))
+
+(def authentication-interceptor
+  "Port of buddy-auth's wrap-authentication middleware."
+  (interceptor/interceptor
+   {:name ::authenticate
+    :enter (fn [context]
+             (update context :request authentication-request session-auth-backend))}))
+
+
+;;;;;;;;;;;;;;;;;;;
 (defn param-spec-interceptor
   "Coerces params according to a spec. If invalid, aborts the interceptor-chain with 422, explaining the issue."
   [spec params-key]
@@ -93,6 +116,7 @@
     ["/register" :get (conj common-interceptors `register-page)]
     ["/register" :post (conj common-interceptors `session.register/perform)]
     ["/login" :get (conj common-interceptors `login-page)]
+    ["/login" :post (into common-interceptors [http/json-body authentication-interceptor (param-spec-interceptor ::session.login/api :form-params) `session.login/perform])]
     ["/invoices-insert" :get (conj common-interceptors `insert-page)]
     ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
