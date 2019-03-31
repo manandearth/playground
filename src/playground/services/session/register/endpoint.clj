@@ -20,11 +20,4 @@
     (if (empty? check)
       (do (jdbc/execute! db insert)
           {:status 301 :headers {"Location" "/login" } :body "" :flash username})
-      {:status 301 :headers {"Location" "/register"} :body "" :flash "username already taken, choose another"})
-    
-    ))
-
-
-
-#_(if-not true (-> (logic/to-insert "toto" "1232")
-                 (h/format)))
+      {:status 301 :headers {"Location" "/register"} :body "" :flash "username already taken, choose another"})))

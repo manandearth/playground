@@ -20,6 +20,8 @@
    [:a {:href "/invoices"} "All Entries"]
    " | "
    [:a {:href "/register"} "Register"]
+   " | "
+   [:a {:href "/login"} "Login"]
    " ]"])
 
 (defn home []
