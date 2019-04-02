@@ -23,6 +23,8 @@
    [:a {:href "/register"} "Register"]
    " | "
    [:a {:href "/login"} "Login"]
+   " | "
+   [:a {:href "/logout"} "Logout"]
    " ]"])
 
 (defn home [{:keys [session] :as request}]
@@ -78,5 +80,5 @@
     [:form {:action "/login" :method "POST"}
      [:div
       [:p [:label "User name: " [:input {:type "text" :name "username"}]]]
-      [:p [:lable "Password: " [:input {:type "text" :name "password"}]]]
+      [:p [:label "Password: " [:input {:type "text" :name "password"}]]]
       [:p [:label "" [:input {:type "submit" :value "submit"}]]]]]]))

@@ -40,6 +40,11 @@
 (defn login-page [request]
   (ring-resp/response (views/login request)))
 
+(defn logout [request]
+  (let [req (assoc request :flash "You have logged out")]
+    (-> (ring-resp/response (views/login req))
+        (assoc-in [:session :identity] nil))))
+
 (spec/def ::temperature int?)
 
 (spec/def ::orientation (spec/and keyword? #{:north :south :east :west}))
@@ -117,6 +122,7 @@
     ["/register" :post (conj common-interceptors `session.register/perform)]
     ["/login" :get (conj common-interceptors `login-page)]
     ["/login" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.login/api :form-params) `session.login/perform])]
+    ["/logout" :get (conj common-interceptors `logout)]
     ["/invoices-insert" :get (conj common-interceptors `insert-page)]
     ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
