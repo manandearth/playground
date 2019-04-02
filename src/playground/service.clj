@@ -26,13 +26,13 @@
    [buddy.auth.backends.session :refer [session-backend]]))
 
 (defn about-page [request]
-  (ring-resp/response (views/about)))
+  (ring-resp/response (views/about request)))
 
 (defn home-page [request]
   (ring-resp/response (views/home request)))
 
 (defn insert-page [request]
-  (ring-resp/response (views/insert)))
+  (ring-resp/response (views/insert request)))
 
 (defn register-page [request]
   (ring-resp/response (views/register request)))

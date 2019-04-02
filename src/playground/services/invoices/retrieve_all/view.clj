@@ -5,10 +5,10 @@
    [io.pedestal.http.route :refer [url-for]]
    [playground.views :as views]))
 
-(defn all-invoices [context & flash]
+(defn all-invoices [request context & flash]
   (page/html5
    (views/gen-page-head "All Entries")
-   views/header-links
+   (views/header-links request)
    [:div
     (when (seq flash) [:h2 flash])
     [:h1 "All Entries"]

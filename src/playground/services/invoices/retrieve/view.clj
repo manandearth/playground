@@ -3,14 +3,14 @@
             [playground.views :as views]))
 
 
-(defn update-invoice [user]
+(defn update-invoice [entry]
   (page/html5
    (views/gen-page-head "Invoice")
-   views/header-links
+   (views/header-links entry)
    [:div
-    [:h1 (str "Update entry id: " (:id user))]
-    [:form {:action (str "/invoices-update/" (:id user)) :method "POST"}
+    [:h1 (str "Update entry id: " (:id entry))]
+    [:form {:action (str "/invoices-update/" (:id entry)) :method "POST"}
       [:div
-       [:p [:label "id: " [:input {:type "hidden" :name "id" :value (:id user)}]] [:span (:id user)]]
-       [:p [:label "amount: " [:input {:type "text" :name "name" :value (first (clojure.string/split (:email user) #"@"))}]]]
+       [:p [:label "id: " [:input {:type "hidden" :name "id" :value (:id entry)}]] [:span (:id entry)]]
+       [:p [:label "amount: " [:input {:type "text" :name "name" :value (first (clojure.string/split (:email entry) #"@"))}]]]
        [:p [:label "λ ->" [:input {:type "submit" :value "Update"}]]]]]]))

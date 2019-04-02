@@ -5,6 +5,7 @@
    [honeysql.core :as h]
    [playground.services.invoices.update.logic :as logic]
    [playground.services.invoices.retrieve-all.logic :as retrieve-all.logic]
+   [ring.util.response :as ring-resp]
    [clojure.string :as string]))
 
 (spec/def ::name (spec/and string? (complement string/blank?)))
@@ -17,4 +18,8 @@
                    (h/format))
         _      (jdbc/execute! db update)]
 
-    {:status 302 :headers {"Location" "/invoices"} :body "" :flash (str "Entry " id " has been updated.")}))
+
+    (-> (ring-resp/redirect "/invoices")
+        (assoc :flash (str "Entry " id " has been updated")))))
+
+#_{:status 302 :headers {"Location" "/invoices"} :body "" :flash (str "Entry " id " has been updated.")}
