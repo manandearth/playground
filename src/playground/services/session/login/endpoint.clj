@@ -2,6 +2,7 @@
   (:require [clojure.java.jdbc :as jdbc]
             [honeysql.core :as h]
             [clojure.spec.alpha :as spec]
+            [ring.util.response :as ring-resp]
             [playground.services.session.login.logic :as logic]))
 
 (spec/def ::username (spec/and string? (spec/nilable not-empty)))
@@ -22,5 +23,16 @@
          (jdbc/query db))))
 
 
-(defn perform [{{:keys [username password]} :form-params :as request}]
-  {:status 301 :headers {"Location" "/"} :body ""})
+(defn perform [request]
+  (let [username (get-in request [:form-params :username])
+        password (get-in request [:form-params :password])
+        session (:session request)
+        found-password (:password (first (password-by-username request username)))]
+    (if (and found-password (= found-password password))
+      (let [next-url (get-in request [:query-params :next] "/")
+            updated-session (assoc session :identity username)]
+        (-> (ring-resp/redirect next-url)
+            (assoc :session updated-session)))
+      (-> (ring-resp/redirect "/login")
+          (assoc :flash "wrong password"))
+      )))

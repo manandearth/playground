@@ -29,7 +29,7 @@
   (ring-resp/response (views/about)))
 
 (defn home-page [request]
-  (ring-resp/response (views/home)))
+  (ring-resp/response (views/home request)))
 
 (defn insert-page [request]
   (ring-resp/response (views/insert)))
@@ -58,7 +58,7 @@
   (session-backend
    {:authfn (fn [request]
               (let [{:keys [username password]} request
-                    known-user                  (get (session.login/all-usernames) username)]
+                    known-user                  (get (session.login/all-usernames request) username)]
                 (when (= (session.login/password-by-username username) password)
                   username)))}))
 
@@ -103,7 +103,7 @@
 
 (def flash-interceptor (ring-middlewares/flash))
 
-(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body session-interceptor flash-interceptor]))
+(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body authentication-interceptor session-interceptor flash-interceptor]))
 
 (def routes
   "Tabular routes"
@@ -116,7 +116,7 @@
     ["/register" :get (conj common-interceptors `register-page)]
     ["/register" :post (conj common-interceptors `session.register/perform)]
     ["/login" :get (conj common-interceptors `login-page)]
-    ["/login" :post (into common-interceptors [http/json-body authentication-interceptor (param-spec-interceptor ::session.login/api :form-params) `session.login/perform])]
+    ["/login" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.login/api :form-params) `session.login/perform])]
     ["/invoices-insert" :get (conj common-interceptors `insert-page)]
     ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]

@@ -1,7 +1,8 @@
 (ns playground.views
   (:require
    [hiccup.page :as page]
-   [hiccup.table :as table]))
+   [hiccup.table :as table]
+   [buddy.auth :refer [authenticated?]]))
 
 (defn gen-page-head
   [title]
@@ -24,12 +25,14 @@
    [:a {:href "/login"} "Login"]
    " ]"])
 
-(defn home []
+(defn home [{:keys [session] :as request}]
   (page/html5
    (gen-page-head "Home")
    header-links
    [:div
-    [:h1 "Hello World!"]]))
+    (if (authenticated? session)
+      [:h1 (str "Hello " (:identity session) "!")]
+      [:h1 "Hello World!"])]))
 
 (defn about []
   (page/html5
@@ -69,11 +72,11 @@
   (page/html5
    (gen-page-head "Login")
    header-links
-   [:div (when (seq flash) [:h2 (str flash ", you have registered. Please login.")])]
+   [:div (when (seq flash) [:h2 flash])]
    [:div
     [:h1 "Login"]
     [:form {:action "/login" :method "POST"}
      [:div
-      [:p [:label "User name: " [:input {:type "text" :name "username" :value (when (seq flash) flash) }]]]
+      [:p [:label "User name: " [:input {:type "text" :name "username"}]]]
       [:p [:lable "Password: " [:input {:type "text" :name "password"}]]]
       [:p [:label "" [:input {:type "submit" :value "submit"}]]]]]]))
