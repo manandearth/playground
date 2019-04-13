@@ -41,8 +41,9 @@
   (ring-resp/response (views/login request)))
 
 (defn logout [request]
-  (let [req (assoc request :flash "You have logged out")]
-     (ring-resp/response (views/login (assoc-in req [:session :identity] nil)))))
+  (-> (ring-resp/redirect (route/url-for :login))
+      (assoc-in [:session :identity] nil)
+      (assoc :flash "You have logged out")))
 
 (spec/def ::temperature int?)
 

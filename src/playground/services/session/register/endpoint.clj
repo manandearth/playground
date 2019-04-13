@@ -4,7 +4,6 @@
             [honeysql.core :as h]
             [ring.util.response :as ring-resp]
             [io.pedestal.http.route :refer [url-for]]
-            [buddy.hashers :as hashers]
             [playground.services.session.register.logic :as logic]))
 
 
@@ -18,7 +17,7 @@
                   (h/format))
         check (jdbc/query db query)
         insert (-> (logic/to-insert username
-                                    (hashers/derive password))
+                                    (logic/derive-password password))
                    (h/format))]
     (if (empty? check)
       (do (jdbc/execute! db insert)

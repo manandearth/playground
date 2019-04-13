@@ -1,6 +1,7 @@
 (ns playground.services.session.login.logic
   (:require [honeysql.core :as h]
-            [honeysql.helpers :refer :all :exclude [update]]))
+            [honeysql.helpers :refer :all :exclude [update]]
+            [buddy.hashers :as hashers]))
 
 (defn to-query [username password]
   (-> (select :*)
@@ -11,4 +12,7 @@
   (-> (select :password)
       (from :register)
       (where [:= :username username])))
+
+(defn check-password [password encrypted]
+  (hashers/check password encrypted))
 
