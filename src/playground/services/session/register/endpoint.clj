@@ -4,12 +4,13 @@
             [honeysql.core :as h]
             [ring.util.response :as ring-resp]
             [io.pedestal.http.route :refer [url-for]]
+            [playground.models.user :as models.user]
             [playground.services.session.register.logic :as logic]))
 
 
-(spec/def ::username (spec/and string? seq (complement clojure.string/blank?)))
-(spec/def ::password (spec/and string? seq (complement clojure.string/blank?)))
-(spec/def ::api (spec/keys :req-un [::username ::password]))
+
+(spec/def ::api (spec/keys :req-un [::models.user/username ::models.user/password]))
+
 
 (defn perform  [{{:keys [username password]} :form-params :keys [db] :as request}]
   (let [db     (->> db :pool (hash-map :datasource))

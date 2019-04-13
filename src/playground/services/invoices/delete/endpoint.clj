@@ -4,11 +4,10 @@
    [clojure.java.jdbc :as jdbc]
    [honeysql.core :as h]
    [playground.services.invoices.delete.logic :as logic]
-   [playground.services.invoices.retrieve-all.logic :as retrieve-all.logic]))
+   [playground.services.invoices.retrieve-all.logic :as retrieve-all.logic]
+   [playground.models.user :as models.user]))
 
-(spec/def ::id nat-int?)
-
-(spec/def ::api (spec/keys :req-un [::id]))
+(spec/def ::api (spec/keys :req-un [::models.user/id]))
 
 (defn perform [{{:keys [id]} :path-params :keys [db] :as request}]
   (let [db (->> db :pool (hash-map :datasource))

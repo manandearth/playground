@@ -6,12 +6,11 @@
    [io.pedestal.http.route :refer [url-for]]
    [playground.services.invoices.update.logic :as logic]
    [playground.services.invoices.retrieve-all.logic :as retrieve-all.logic]
+   [playground.models.user :as models.user]
    [ring.util.response :as ring-resp]
    [clojure.string :as string]))
 
-(spec/def ::name (spec/and string? seq (complement string/blank?)))
-
-(spec/def ::api (spec/keys :req-un [::name]))
+(spec/def ::api (spec/keys :req-un [::models.user/name]))
 
 (defn perform [{{:keys [name]} :form-params {:keys [id]} :path-params :keys [db] :as request}]
   (let [db     (->> db :pool (hash-map :datasource))
