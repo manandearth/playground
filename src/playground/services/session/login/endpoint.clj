@@ -7,8 +7,8 @@
             [buddy.hashers :as hashers]
             [playground.services.session.login.logic :as logic]))
 
-(spec/def ::username (spec/and string? seq))
-(spec/def ::password (spec/and string? seq))
+(spec/def ::username (spec/and string? seq (complement clojure.string/blank?)))
+(spec/def ::password (spec/and string? seq (complement clojure.string/blank?)))
 (spec/def ::api (spec/keys :req-un [::username ::password]))
 
 (defn password-by-username [{:keys [db] :as request} username]

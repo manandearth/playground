@@ -116,8 +116,8 @@
     ;;FIXME change the routes definition format from: (def routes #{...})
     ;;to (def routes (io.pedestal.http.route.definition.table/table-routes ...))
     ;;as "/invoices/:id" is conflicting with "/invoices/insert"
-    ["/register" :get (conj common-interceptors `register-page) :route-name :register]
-    ["/register" :post (conj common-interceptors `session.register/perform)]
+    ["/register" :get (conj common-interceptors  `register-page) :route-name :register]
+    ["/register" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.register/api :form-params) `session.register/perform])]
     ["/login" :get (conj common-interceptors `login-page) :route-name :login]
     ["/login" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.login/api :form-params) `session.login/perform])]
     ["/logout" :get (conj common-interceptors `logout)]

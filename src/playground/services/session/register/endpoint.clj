@@ -8,11 +8,9 @@
             [playground.services.session.register.logic :as logic]))
 
 
-(spec/def ::username (spec/and string? seq))
-(spec/def ::password (spec/and string? seq))
+(spec/def ::username (spec/and string? seq (complement clojure.string/blank?)))
+(spec/def ::password (spec/and string? seq (complement clojure.string/blank?)))
 (spec/def ::api (spec/keys :req-un [::username ::password]))
-
-
 
 (defn perform  [{{:keys [username password]} :form-params :keys [db] :as request}]
   (let [db     (->> db :pool (hash-map :datasource))

@@ -9,7 +9,7 @@
    [ring.util.response :as ring-resp]
    [clojure.string :as string]))
 
-(spec/def ::name (spec/and string? (complement string/blank?)))
+(spec/def ::name (spec/and string? seq (complement string/blank?)))
 
 (spec/def ::api (spec/keys :req-un [::name]))
 
