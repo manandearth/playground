@@ -5,16 +5,9 @@
             [ring.util.response :as ring-resp]
             [playground.services.session.login.logic :as logic]))
 
-(spec/def ::username (spec/and string? (spec/nilable not-empty)))
-(spec/def ::password (spec/and string? (spec/nilable not-empty)))
+(spec/def ::username (spec/and string? seq))
+(spec/def ::password (spec/and string? seq))
 (spec/def ::api (spec/keys :req-un [::username ::password]))
-
-
-(defn all-usernames [{:keys [db] :as request}]
-  (let [db (->> db :pool (hash-map :datasource))]
-    (->> (logic/query-all-usernames)
-         (h/format)
-         (jdbc/query db))))
 
 (defn password-by-username [{:keys [db] :as request} username]
   (let [db (->> db :pool (hash-map :datasource))]

@@ -3,6 +3,7 @@
    [clojure.java.jdbc :as jdbc]
    [clojure.spec.alpha :as spec]
    [honeysql.core :as h]
+   [io.pedestal.http.route :refer [url-for]]
    [playground.services.invoices.update.logic :as logic]
    [playground.services.invoices.retrieve-all.logic :as retrieve-all.logic]
    [ring.util.response :as ring-resp]
@@ -19,7 +20,6 @@
         _      (jdbc/execute! db update)]
 
 
-    (-> (ring-resp/redirect "/invoices")
+    (-> (ring-resp/redirect (url-for :invoices))
         (assoc :flash (str "Entry " id " has been updated")))))
 
-#_{:status 302 :headers {"Location" "/invoices"} :body "" :flash (str "Entry " id " has been updated.")}

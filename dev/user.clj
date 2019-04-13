@@ -60,7 +60,7 @@
   [sys]
   (get-in sys [:pedestal :server ::http/service-fn]))
 
-(defn comp-response-for [verb route]
+(defn response-map-for-route [verb route]
   (let [service (service-fn system)]
     (response-for service verb route)))
 

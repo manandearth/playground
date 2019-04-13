@@ -7,10 +7,6 @@
       (from   :register)
       (where  [:= :username username] [:= :password password])))
 
-(defn query-all-usernames []
-  (-> (select :username)
-      (from   :register)))
-
 (defn query-pass-by-user [username]
   (-> (select :password)
       (from :register)

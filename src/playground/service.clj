@@ -42,8 +42,7 @@
 
 (defn logout [request]
   (let [req (assoc request :flash "You have logged out")]
-    (-> (ring-resp/response (views/login req))
-        (assoc-in [:session :identity] nil))))
+     (ring-resp/response (views/login (assoc-in req [:session :identity] nil)))))
 
 (spec/def ::temperature int?)
 
@@ -62,8 +61,7 @@
 (def session-auth-backend
   (session-backend
    {:authfn (fn [request]
-              (let [{:keys [username password]} request
-                    known-user                  (get (session.login/all-usernames request) username)]
+              (let [{:keys [username password]} request]
                 (when (= (session.login/password-by-username username) password)
                   username)))}))
 
@@ -127,7 +125,7 @@
     ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
     ["/invoices/:id" :get (conj common-interceptors (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoices.retrieve/perform) :route-name :invoices/:id]
-    ["/invoices" :get (conj common-interceptors `invoices.retrieve-all/perform)]
+    ["/invoices" :get (conj common-interceptors `invoices.retrieve-all/perform) :route-name :invoices]
     ["/invoices-delete/:id" :get (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.delete/api :path-params) `invoices.delete/perform]) :route-name :invoices-delete/:id]
     })
 
