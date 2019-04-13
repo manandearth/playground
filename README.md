@@ -44,6 +44,9 @@ For the service.invoices ns create a table:
 
 and register table that keeps auth login data:
 
-`CREATE TABLE register (username VARCHAR(50), password VARCHAR(50)`
+`CREATE TABLE register ( username VARCHAR(20), password VARCHAR(100), role VARCHAR(20) DEFAULT 'user');`
 
+to alter role to admin:
+
+`UPDATE register SET ROLE = 'admin' WHERE username = 'foo';`
 

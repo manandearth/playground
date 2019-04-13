@@ -11,3 +11,4 @@
   (-> (select :password)
       (from :register)
       (where [:= :username username])))
+

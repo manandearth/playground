@@ -2,10 +2,14 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.spec.alpha :as spec]
             [honeysql.core :as h]
+            [ring.util.response :as ring-resp]
+            [io.pedestal.http.route :refer [url-for]]
+            [buddy.hashers :as hashers]
             [playground.services.session.register.logic :as logic]))
 
-(spec/def ::username (spec/and string? (spec/nilable not-empty)))
-(spec/def ::password (spec/and string? (spec/nilable not-empty)))
+
+(spec/def ::username (spec/and string? seq))
+(spec/def ::password (spec/and string? seq))
 (spec/def ::api (spec/keys :req-un [::username ::password]))
 
 
@@ -15,9 +19,12 @@
         query (-> (logic/to-check username)
                   (h/format))
         check (jdbc/query db query)
-        insert (-> (logic/to-insert username password)
+        insert (-> (logic/to-insert username
+                                    (hashers/derive password))
                    (h/format))]
     (if (empty? check)
       (do (jdbc/execute! db insert)
-          {:status 301 :headers {"Location" "/login" } :body "" :flash (str  username ", you are registered. please login")})
-      {:status 301 :headers {"Location" "/register"} :body "" :flash "username already taken, choose another"})))
+          (-> (ring-resp/redirect (url-for :login))
+              (assoc :flash (str  username ", you are registered. please login"))))
+      (-> (ring-resp/redirect (url-for :register))
+          (assoc :flash "username already taken. choose another")))))
