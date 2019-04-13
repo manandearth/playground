@@ -28,7 +28,9 @@
                  [prismatic/schema "1.1.9"]
                  [spec-coerce "1.0.0-alpha6"]
                  [hiccup "1.0.5"]
-                 [hiccup-table "0.2.0"]]
+                 [hiccup-table "0.2.0"]
+                 [buddy/buddy-auth "2.1.0"]
+                 [buddy/buddy-hashers "1.3.0"]]
   :repl-options {:port 41234}
   :min-lein-version "2.0.0"
   :resource-paths ["config" "resources"]

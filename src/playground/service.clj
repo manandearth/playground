@@ -6,6 +6,7 @@
    [io.pedestal.http :as http]
    [io.pedestal.http.body-params :as body-params]
    [io.pedestal.http.route :as route]
+   [io.pedestal.interceptor :as interceptor]
    [io.pedestal.interceptor.chain :as interceptor-chain]
    [io.pedestal.http.ring-middlewares :as ring-middlewares]
    [playground.coerce :as coerce]
@@ -15,19 +16,34 @@
    [playground.services.invoices.retrieve-all.endpoint :as invoices.retrieve-all]
    [playground.services.invoices.retrieve.endpoint :as invoices.retrieve]
    [playground.services.invoices.update.endpoint :as invoices.update]
+   [playground.services.session.register.endpoint :as session.register]
+   [playground.services.session.login.endpoint :as session.login]
    [playground.views :as views]
    [ring.util.response :as ring-resp]
    [ring.middleware.session.cookie :as cookie]
-   [ring.middleware.flash :as flash]))
+   [ring.middleware.flash :as flash]
+   [buddy.auth.middleware :refer [authentication-request]]
+   [buddy.auth.backends.session :refer [session-backend]]))
 
 (defn about-page [request]
-  (ring-resp/response (views/about)))
+  (ring-resp/response (views/about request)))
 
 (defn home-page [request]
-  (ring-resp/response (views/home)))
+  (ring-resp/response (views/home request)))
 
 (defn insert-page [request]
-  (ring-resp/response (views/insert)))
+  (ring-resp/response (views/insert request)))
+
+(defn register-page [request]
+  (ring-resp/response (views/register request)))
+
+(defn login-page [request]
+  (ring-resp/response (views/login request)))
+
+(defn logout [request]
+  (-> (ring-resp/redirect (route/url-for :login))
+      (assoc-in [:session :identity] nil)
+      (assoc :flash "You have logged out")))
 
 (spec/def ::temperature int?)
 
@@ -41,6 +57,24 @@
   {:status 200
    :body   {:temperature temperature :orientation orientation}})
 
+;;auth interceptors
+
+(def session-auth-backend
+  (session-backend
+   {:authfn (fn [request]
+              (let [{:keys [username password]} request]
+                (when (= (session.login/password-by-username username) password)
+                  {:username username :password password})))}))
+
+(def authentication-interceptor
+  "Port of buddy-auth's wrap-authentication middleware."
+  (interceptor/interceptor
+   {:name ::authenticate
+    :enter (fn [context]
+             (update context :request authentication-request session-auth-backend))}))
+
+
+;;;;;;;;;;;;;;;;;;;
 (defn param-spec-interceptor
   "Coerces params according to a spec. If invalid, aborts the interceptor-chain with 422, explaining the issue."
   [spec params-key]
@@ -73,7 +107,7 @@
 
 (def flash-interceptor (ring-middlewares/flash))
 
-(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body session-interceptor flash-interceptor]))
+(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body authentication-interceptor session-interceptor flash-interceptor]))
 
 (def routes
   "Tabular routes"
@@ -83,11 +117,16 @@
     ;;FIXME change the routes definition format from: (def routes #{...})
     ;;to (def routes (io.pedestal.http.route.definition.table/table-routes ...))
     ;;as "/invoices/:id" is conflicting with "/invoices/insert"
+    ["/register" :get (conj common-interceptors  `register-page) :route-name :register]
+    ["/register" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.register/api :form-params) `session.register/perform])]
+    ["/login" :get (conj common-interceptors `login-page) :route-name :login]
+    ["/login" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.login/api :form-params) `session.login/perform])]
+    ["/logout" :get (conj common-interceptors `logout)]
     ["/invoices-insert" :get (conj common-interceptors `insert-page)]
     ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
     ["/invoices/:id" :get (conj common-interceptors (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoices.retrieve/perform) :route-name :invoices/:id]
-    ["/invoices" :get (conj common-interceptors `invoices.retrieve-all/perform)]
+    ["/invoices" :get (conj common-interceptors `invoices.retrieve-all/perform) :route-name :invoices]
     ["/invoices-delete/:id" :get (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.delete/api :path-params) `invoices.delete/perform]) :route-name :invoices-delete/:id]
     })
 

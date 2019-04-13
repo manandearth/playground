@@ -16,5 +16,4 @@
         all-records (->> (logic/query-all)
                          (h/format)
                          (jdbc/query db))]
-    {:status 200 :body (view/all-invoices all-records flash)
-     }))
+    {:status 200 :body (view/all-invoices request all-records flash)}))
