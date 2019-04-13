@@ -63,7 +63,7 @@
    {:authfn (fn [request]
               (let [{:keys [username password]} request]
                 (when (= (session.login/password-by-username username) password)
-                  username)))}))
+                  {:username username :password password})))}))
 
 (def authentication-interceptor
   "Port of buddy-auth's wrap-authentication middleware."

@@ -45,7 +45,7 @@
    (header-links request)
    [:div
     (if (authenticated? session)
-      [:h1 (str "Hello " (:identity session) "!")]
+      [:h1 (str "Hello " (get-in session [:identity :username]) "!")]
       [:h1 "Hello World!"])]))
 
 (defn about [request]

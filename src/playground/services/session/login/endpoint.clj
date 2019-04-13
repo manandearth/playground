@@ -24,7 +24,7 @@
         session (:session request)]
     (if (hashers/check password (:password (first (password-by-username request username))))
       (let [next-url (get-in request [:query-params :next] "/")
-                     updated-session (assoc session :identity username)]
+            updated-session (assoc session :identity {:username username :password password})]
                  (-> (ring-resp/redirect next-url)
                      (assoc :session updated-session)))
       (-> (ring-resp/redirect (url-for :login))
