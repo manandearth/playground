@@ -23,7 +23,8 @@
    [ring.middleware.session.cookie :as cookie]
    [ring.middleware.flash :as flash]
    [buddy.auth.middleware :refer [authentication-request]]
-   [buddy.auth.backends.session :refer [session-backend]]))
+   [buddy.auth.backends.session :refer [session-backend]]
+   [buddy.auth :refer [authenticated? throw-unauthorized]]))
 
 (defn about-page [request]
   (ring-resp/response (views/about request)))
