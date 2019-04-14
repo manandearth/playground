@@ -30,8 +30,6 @@
      " | "
      [:a {:href "/about"} "About"]
      " | "
-     [:a {:href "/invoices-insert"} "Add an entry"]
-     " | "
      [:a {:href "/invoices"} "All Entries"]
      " | "
      [:a {:href "/register"} "Register"]
