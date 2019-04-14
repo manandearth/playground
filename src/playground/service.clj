@@ -5,7 +5,7 @@
    [com.grzm.component.pedestal :as pedestal-component]
    [io.pedestal.http :as http]
    [io.pedestal.http.body-params :as body-params]
-   [io.pedestal.http.route :as route]
+   [io.pedestal.http.route :refer [url-for] :as route]
    [io.pedestal.interceptor :as interceptor]
    [io.pedestal.interceptor.chain :as interceptor-chain]
    [io.pedestal.http.ring-middlewares :as ring-middlewares]
@@ -33,7 +33,10 @@
   (ring-resp/response (views/home request)))
 
 (defn insert-page [request]
-  (ring-resp/response (views/insert request)))
+  (if (authenticated? (:session request))
+    (ring-resp/response (views/insert request))
+    (-> (ring-resp/redirect (url-for :invoices))
+        (assoc :flash "login to add entries"))))
 
 (defn register-page [request]
   (ring-resp/response (views/register request)))

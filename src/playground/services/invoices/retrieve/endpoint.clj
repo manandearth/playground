@@ -30,5 +30,5 @@
           (ring-resp/response (view/update-invoice record))
           {:status 404 :body "Entry not in DB"}))
       (-> (ring-resp/redirect (url-for :invoices))
-          (assoc :flash "you must login to edit any enries"))
+          (assoc :flash "you must login to edit any entries"))
       ))
