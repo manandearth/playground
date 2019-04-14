@@ -86,7 +86,10 @@
             (let [role (get-in context [:request :session :identity :role])]
               (if (= role models.user/admin-role)
                 context
-                (throw-unauthorized)
+                (-> context
+                    (assoc :response {:status 403
+                                      :body   "Unauthorized"})
+                    interceptor-chain/terminate)
                 )))})
 
 ;;;;;;;;;;;;;;;;;;;
