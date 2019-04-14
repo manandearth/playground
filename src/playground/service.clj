@@ -79,9 +79,9 @@
     :enter (fn [context]
              (update context :request authentication-request session-auth-backend))}))
 
-(def authorization-interceptor
-  "throw unautherize by role"
-  {:name ::authorize
+(def admin-interceptor
+  "throw unautherized 403 by role (allows admin only)"
+  {:name ::admin-interceptor
    :enter (fn [context]
             (let [role (get-in context [:request :session :identity :role])]
               (if (= role models.user/admin-role)
@@ -145,7 +145,7 @@
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
     ["/invoices/:id" :get (conj common-interceptors (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoices.retrieve/perform) :route-name :invoices/:id]
     ["/invoices" :get (conj common-interceptors `invoices.retrieve-all/perform) :route-name :invoices]
-    ["/invoices-delete/:id" :get (into common-interceptors [http/json-body authorization-interceptor (param-spec-interceptor ::invoices.delete/api :path-params) `invoices.delete/perform]) :route-name :invoices-delete/:id]
+    ["/invoices-delete/:id" :get (into common-interceptors [http/json-body admin-interceptor (param-spec-interceptor ::invoices.delete/api :path-params) `invoices.delete/perform]) :route-name :invoices-delete/:id]
     })
 
 (comment
