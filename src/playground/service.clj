@@ -25,7 +25,8 @@
    [ring.middleware.flash :as flash]
    [buddy.auth.middleware :refer [authentication-request]]
    [buddy.auth.backends.session :refer [session-backend]]
-   [buddy.auth :refer [authenticated? throw-unauthorized]]))
+   [buddy.auth :refer [authenticated? throw-unauthorized]]
+   [buddy.hashers :as hashers]))
 
 (defn about-page [request]
   (ring-resp/response (views/about request)))
@@ -68,8 +69,8 @@
   (session-backend
    {:authfn (fn [request]
               (let [{:keys [username password]} request]
-                (when (= (session.login/password-by-username username) password)
-                  {:username username :password password})))}))
+                (when (= (session.login/password-by-username request username) (hashers/derive password))
+                  {:username username :password (hashers/derive password) :role (session.login/get-role request username)})))}))
 
 (def authentication-interceptor
   "Port of buddy-auth's wrap-authentication middleware."
