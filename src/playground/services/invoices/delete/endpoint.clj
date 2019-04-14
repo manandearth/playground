@@ -14,18 +14,17 @@
 
 (defn perform [{{:keys [id]} :path-params :keys [db session] :as request}]
   (let  [role (get-in session [:identity :role])]
-    (if (= "admin" role)
-      (let [db (->> db :pool (hash-map :datasource))
-            _  (->> (logic/to-delete id)
-                    (h/format)
-                    (jdbc/execute! db))
-            fetch  (h/format (retrieve-all.logic/query-all))
-            left   (->> (logic/to-serialize)
-                        (h/format)
-                        (jdbc/query db)
-                        (first))
-            result (jdbc/query db fetch)
-            result-map {:result result :deleted id}]
-        (-> (ring-resp/redirect (url-for :invoices))
-            (assoc :flash (str "Entry " id " has beed deleted."))))
-      (throw-unauthorized))))
+    (let [db (->> db :pool (hash-map :datasource))
+          _  (->> (logic/to-delete id)
+                  (h/format)
+                  (jdbc/execute! db))
+          fetch  (h/format (retrieve-all.logic/query-all))
+          left   (->> (logic/to-serialize)
+                      (h/format)
+                      (jdbc/query db)
+                      (first))
+          result (jdbc/query db fetch)
+          result-map {:result result :deleted id}]
+      (-> (ring-resp/redirect (url-for :invoices))
+          (assoc :flash (str "Entry " id " has beed deleted."))))
+    ))

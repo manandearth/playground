@@ -18,6 +18,7 @@
    [playground.services.invoices.update.endpoint :as invoices.update]
    [playground.services.session.register.endpoint :as session.register]
    [playground.services.session.login.endpoint :as session.login]
+   [playground.models.user :as models.user]
    [playground.views :as views]
    [ring.util.response :as ring-resp]
    [ring.middleware.session.cookie :as cookie]
@@ -77,6 +78,15 @@
     :enter (fn [context]
              (update context :request authentication-request session-auth-backend))}))
 
+(def authorization-interceptor
+  "throw unautherize by role"
+  {:name ::authorize
+   :enter (fn [context]
+            (let [role (get-in context [:request :session :identity :role])]
+              (if (= role models.user/admin-role)
+                context
+                (throw-unauthorized)
+                )))})
 
 ;;;;;;;;;;;;;;;;;;;
 (defn param-spec-interceptor
@@ -131,7 +141,7 @@
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
     ["/invoices/:id" :get (conj common-interceptors (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoices.retrieve/perform) :route-name :invoices/:id]
     ["/invoices" :get (conj common-interceptors `invoices.retrieve-all/perform) :route-name :invoices]
-    ["/invoices-delete/:id" :get (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.delete/api :path-params) `invoices.delete/perform]) :route-name :invoices-delete/:id]
+    ["/invoices-delete/:id" :get (into common-interceptors [http/json-body authorization-interceptor (param-spec-interceptor ::invoices.delete/api :path-params) `invoices.delete/perform]) :route-name :invoices-delete/:id]
     })
 
 (comment

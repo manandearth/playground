@@ -10,3 +10,4 @@
 
 (spec/def ::amount nat-int?)
 
+(def admin-role "admin")
