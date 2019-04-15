@@ -8,9 +8,11 @@
 
 (spec/def ::api (spec/keys :req-un [::models.user/amount]))
 
-(defn perform [{{:keys [amount]} :form-params :keys [db] :as request}]
+(defn perform [{{:keys [amount]} :form-params :keys [db session] :as request}]
   (let [db     (->> db :pool (hash-map :datasource))
-        insert (-> (logic/to-insert amount (java.util.UUID/randomUUID))
+        insert (-> (logic/to-insert amount
+                                    (java.util.UUID/randomUUID)
+                                    session)
                    (h/format))
         _      (jdbc/execute! db insert)
         ]

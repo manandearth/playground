@@ -2,7 +2,7 @@
   (:require [clojure.spec.alpha :as spec]
             [clojure.string :as string]))
 
-(spec/def ::username (spec/and string? seq (complement clojure.string/blank?)))
+(spec/def ::username (spec/and string? seq (complement string/blank?)))
 (spec/def ::password ::username)
 (spec/def ::name ::username)
 

@@ -40,7 +40,7 @@ It requires to have the following namespaces required:
 
 For the service.invoices ns create a table:
 
-`CREATE TABLE users (id SERIAL, email VARCHAR(50))`
+`CREATE TABLE users (id SERIAL, email VARCHAR(50), authored VARCHAR(20))`
 
 and register table that keeps auth login data:
 
