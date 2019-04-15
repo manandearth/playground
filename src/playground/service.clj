@@ -80,7 +80,7 @@
                (if (authenticated? session)
                  (update context :request authentication-request session-auth-backend)
                  (-> context
-                        (assoc :response {:status 403
+                        (assoc :response {:status 401
                                           :body   "must login for that..."})
                         interceptor-chain/terminate))))}))
 
@@ -150,7 +150,7 @@
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
     ["/invoices/:id" :get (into common-interceptors [authentication-interceptor (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoices.retrieve/perform]) :route-name :invoices/:id]
     ["/invoices" :get (conj common-interceptors `invoices.retrieve-all/perform) :route-name :invoices]
-    ["/invoices-delete/:id" :get (into common-interceptors [http/json-body admin-interceptor (param-spec-interceptor ::invoices.delete/api :path-params) `invoices.delete/perform]) :route-name :invoices-delete/:id]
+    ["/invoices-delete/:id" :get (into common-interceptors [http/json-body authentication-interceptor admin-interceptor (param-spec-interceptor ::invoices.delete/api :path-params) `invoices.delete/perform]) :route-name :invoices-delete/:id]
     })
 
 (comment
