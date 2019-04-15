@@ -3,8 +3,8 @@
             [clojure.string :as string]))
 
 (spec/def ::username (spec/and string? seq (complement clojure.string/blank?)))
-(spec/def ::password (spec/and string? seq (complement clojure.string/blank?)))
-(spec/def ::name (spec/and string? seq (complement string/blank?)))
+(spec/def ::password ::username)
+(spec/def ::name ::username)
 
 (spec/def ::id nat-int?)
 
