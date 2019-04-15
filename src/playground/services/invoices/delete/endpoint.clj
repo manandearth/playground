@@ -3,7 +3,6 @@
    [clojure.spec.alpha :as spec]
    [clojure.java.jdbc :as jdbc]
    [honeysql.core :as h]
-   [buddy.auth :refer [authenticated? throw-unauthorized]]
    [io.pedestal.http.route :refer (url-for)]
    [playground.services.invoices.delete.logic :as logic]
    [playground.services.invoices.retrieve-all.logic :as retrieve-all.logic]

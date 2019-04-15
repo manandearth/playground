@@ -3,10 +3,10 @@
             [playground.views :as views]))
 
 
-(defn update-invoice [user]
+(defn update-invoice [request user]
   (page/html5
    (views/gen-page-head "Invoice")
-   (views/header-links user)
+   (views/header-links request)
    [:div
     [:h1 (str "Update user id: " (:id user))]
     [:form {:action (str "/invoices-update/" (:id user)) :method "POST"}
