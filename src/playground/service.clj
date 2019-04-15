@@ -97,6 +97,25 @@
                     interceptor-chain/terminate)
                 )))})
 
+(def author-interceptor
+  "throw unauthorized 403 by author
+  (allows admin and author of entry)"
+  {:name ::author-interceptor
+   :enter (fn [context]
+            (let [role     (get-in context [:request :session :identity :role])
+                  username (get-in context [:request :session :identity :username])
+                  id       (get-in context [:request :path-params :id])
+                  db       (get-in context [:request :db])
+                  authored (invoices.retrieve/return-authored (:request context))]
+              (if (or (= role models.user/admin-role) (= username authored))
+                context
+                (-> context
+                    (assoc :response {:status 403
+                                      :body "only permitted to author and admin"})
+                    interceptor-chain/terminate))))})
+
+
+
 ;;;;;;;;;;;;;;;;;;;
 (defn param-spec-interceptor
   "Coerces params according to a spec. If invalid, aborts the interceptor-chain with 422, explaining the issue."
@@ -148,7 +167,7 @@
     ["/invoices-insert" :get (into  common-interceptors [authentication-interceptor `insert-page])]
     ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
-    ["/invoices/:id" :get (into common-interceptors [authentication-interceptor (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoices.retrieve/perform]) :route-name :invoices/:id]
+    ["/invoices/:id" :get (into common-interceptors [(param-spec-interceptor ::invoices.retrieve/api :path-params) author-interceptor `invoices.retrieve/perform]) :route-name :invoices/:id]
     ["/invoices" :get (conj common-interceptors `invoices.retrieve-all/perform) :route-name :invoices]
     ["/invoices-delete/:id" :get (into common-interceptors [http/json-body admin-interceptor (param-spec-interceptor ::invoices.delete/api :path-params) `invoices.delete/perform]) :route-name :invoices-delete/:id]
     })

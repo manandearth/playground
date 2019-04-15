@@ -4,3 +4,8 @@
   {:select [:*]
    :from   [:users]
    :where  [:= :id id]})
+
+(defn get-authored [id]
+  {:select [:authored]
+   :from [:users]
+   :where [:= :id id]})
