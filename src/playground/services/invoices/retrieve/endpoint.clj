@@ -28,9 +28,10 @@
       (ring-resp/response (view/update-invoice request record))
       {:status 404 :body "Entry not in DB"})))
 
-(defn return-authored [{{:keys [id]} :path-params :keys [session db] :as request}]
+(defn return-authored [{{:keys [id]} :path-params :keys [db] :as request}]
   (let [db     (->> db :pool (hash-map :datasource))
         record (->> (logic/get-authored id)
                     (h/format)
                     (jdbc/query db)
-                    (first))]))
+                    (first))]
+    record))

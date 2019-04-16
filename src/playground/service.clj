@@ -101,7 +101,7 @@
                   username (get-in context [:request :session :identity :username])
                   id       (get-in context [:request :path-params :id])
                   db       (get-in context [:request :db])
-                  authored (invoices.retrieve/return-authored (:request context))]
+                  authored (:authored (invoices.retrieve/return-authored (:request context)))]
               (if (or (= role models.user/admin-role) (= username authored))
                 context
                 (-> context
