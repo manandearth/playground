@@ -31,7 +31,7 @@
         session (:session request)]
     (if (logic/check-password password (:password (password-by-username request username)))
       (let [next-url (get-in request [:query-params :next] "/")
-            updated-session (assoc session :identity (conj {:username username :password password} (get-role request username)))]
+            updated-session (assoc session :identity (conj {:username username} (get-role request username)))]
                  (-> (ring-resp/redirect next-url)
                      (assoc :session updated-session)))
       (-> (ring-resp/redirect (url-for :login))
