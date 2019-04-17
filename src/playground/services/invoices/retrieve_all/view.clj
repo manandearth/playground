@@ -24,7 +24,7 @@
            extended-context (map #(assoc % :delete (:id %)) context)]
        (table/to-table1d
         extended-context
-        [:id "ID" :email "Email" :authored "Authored-by" :delete "to-delete"]
+        [:id "ID" :email "Email" :author "Author" :delete "to-delete"]
         attr-fns))]]))
 
 

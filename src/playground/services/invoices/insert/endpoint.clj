@@ -12,7 +12,7 @@
   (let [db     (->> db :pool (hash-map :datasource))
         insert (-> (logic/to-insert amount
                                     (java.util.UUID/randomUUID)
-                                    session)
+                                    (get-in session [:identity :username]))
                    (h/format))
         _      (jdbc/execute! db insert)
         ]
