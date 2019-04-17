@@ -9,10 +9,10 @@
       (hh/where [:= :id id])))
 
 (def to-query
-  {:select   [:id :email :authored]
+  {:select   [:id :email :author]
    :from     [:users]
    :order-by [[:id :desc]]
    :limit    1})
 
 (defn to-serialize [results]
-  (-> results first (select-keys [:id :email :authored])))
+  (-> results first (select-keys [:id :email :author])))

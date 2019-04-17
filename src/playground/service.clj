@@ -28,6 +28,9 @@
    [buddy.auth :refer [authenticated?]]
    [buddy.hashers :as hashers]))
 
+(defn test-page [request]
+  (ring-resp/response (str (get-in request [:session :identity :username]))))
+
 (defn about-page [request]
   (ring-resp/response (views/about request)))
 
@@ -101,8 +104,8 @@
                   username (get-in context [:request :session :identity :username])
                   id       (get-in context [:request :path-params :id])
                   db       (get-in context [:request :db])
-                  authored (:authored (invoices.retrieve/return-authored (:request context)))]
-              (if (or (= role models.user/admin-role) (= username authored))
+                  author (:author (invoices.retrieve/return-author (:request context)))]
+              (if (or (= role models.user/admin-role) (= username author))
                 context
                 (-> context
                     (assoc :response {:status 403
@@ -150,6 +153,7 @@
   "Tabular routes"
   #{["/" :get (conj common-interceptors `home-page) :route-name :home]
     ["/about" :get (conj common-interceptors `about-page)]
+    ["/test" :get (conj common-interceptors `test-page)]
     ["/api" :get (into component-interceptors [http/json-body (param-spec-interceptor ::api :query-params) `api])]
     ;;FIXME change the routes definition format from: (def routes #{...})
     ;;to (def routes (io.pedestal.http.route.definition.table/table-routes ...))
