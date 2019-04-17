@@ -2,10 +2,10 @@
   (:require
    [honeysql.helpers :as hh]))
 
-(defn to-insert [amount random-uuid session]
+(defn to-insert [amount random-uuid username]
   (-> (hh/insert-into :users)
       (hh/values [{:email (str amount "@" random-uuid ".com")
-                   :author (get-in session [:identity :username])}])))
+                   :author username}])))
 
 (def to-query
   {:select   [:id :email :author]
