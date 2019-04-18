@@ -26,7 +26,6 @@
   (::http/service-fn (http/create-servlet (assoc service/service
                                                            ::http/enable-session {:store session-store}))))
 
-
 (deftest stub-session-store-test
   (let [expected-id "boo"
         session-store (make-session-store (constantly {:id expected-id})
@@ -45,7 +44,7 @@
   (::http/service-fn (http/create-servlet (assoc server/dev-map
                                                  ::http/enable-session {:store session-store}))))
 
-(response-for (make-comp-session boo-session) :get "/")
+#_(response-for (make-comp-session boo-session) :get "/")
 
 (comment
 
@@ -54,4 +53,4 @@
 
  )
 
-(make-service-fn boo-session)
+#_(make-service-fn boo-session)

@@ -30,7 +30,11 @@
                  [hiccup "1.0.5"]
                  [hiccup-table "0.2.0"]
                  [buddy/buddy-auth "2.1.0"]
-                 [buddy/buddy-hashers "1.3.0"]]
+                 [buddy/buddy-hashers "1.3.0"]
+                 [sparkledriver "0.2.4"]
+                 [lambdaisland/uri "1.1.0"]
+                 
+                 #_[etaoin "0.3.2"]]
   :repl-options {:port 41234}
   :min-lein-version "2.0.0"
   :resource-paths ["config" "resources"]
@@ -38,6 +42,7 @@
   :profiles {:dev {:dependencies [[io.pedestal/pedestal.service-tools "0.5.3"]
                                   [com.stuartsierra/component.repl "0.2.0"]
                                   [org.clojure/tools.namespace "0.3.0-alpha4"]
+                                  #_[javax.servlet/servlet-api "2.5"]
                                   [org.clojure/tools.nrepl "0.2.13" :exclusions [org.clojure/clojure]]]
                    :source-paths ["dev"]
                    :repl-options {:init-ns user}}
