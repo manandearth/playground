@@ -6,7 +6,6 @@
   :dependencies [
                  #_[amazonica "0.3.125"]
                  #_[background-processing "0.1.0-SNAPSHOT"]
-                 [commons-codec "1.9"]
                  [better-cond "1.0.1"]
                  [ch.qos.logback/logback-classic "1.1.8" :exclusions [org.slf4j/slf4j-api]]
                  [com.grzm/component.pedestal "0.1.7"]
@@ -32,7 +31,7 @@
                  [hiccup-table "0.2.0"]
                  [buddy/buddy-auth "2.1.0"]
                  [buddy/buddy-hashers "1.3.0"]
-                 [sparkledriver "0.2.4"]
+                 #_[sparkledriver "0.2.4"]
                  [lambdaisland/uri "1.1.0"]
                  [etaoin "0.3.2"]]
   :repl-options {:port 41234}

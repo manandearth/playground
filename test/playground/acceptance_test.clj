@@ -1,8 +1,8 @@
 (ns playground.acceptance-test
   (:require [clojure.test :refer :all]
             [playground.test-helper :refer :all]
-            [sparkledriver.browser :as sd]
-            [sparkledriver.element :as sde :refer [click! send-text!]]))
+            #_[sparkledriver.browser :as sd]
+            #_[sparkledriver.element :as sde :refer [click! send-text!]]))
 
 
 #_(use-fixtures :once wrap-test-system wrap-browser)
@@ -21,11 +21,11 @@
             (fetch! (app-url "/"))
             (find-by-tag "div")))))
   
-
-(deftest basic-tests
-  (sd/with-browser [browser (fetch! (sd/make-browser) (str "http:/localhost:" 8080))]
-    (testing "loads the page"
-        (is (= 200 (sd/status-code browser))))))
+(comment
+  (deftest basic-tests
+    (sd/with-browser [browser (fetch! (sd/make-browser) (str "http:/localhost:" 8080))]
+      (testing "loads the page"
+        (is (= 200 (sd/status-code browser)))))))
 
 
 
