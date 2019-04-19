@@ -25,22 +25,6 @@
 (defn app-url [path]
   (str "http://localhost:" app-port path))
 
-
-(defn wrap-test-system
-  "A fixture function which sets up the system before tests and tears it down afterwards."
-  [tests]
-  (let [system (component/start user/test-system)]
-    (tests)
-    (component/stop user/test-system)
-    #_(io/delete-file (:db-path config))))
-
-(defn fixture-driver
-  "Executes a test running a driver. Bounds a driver
-   with the global *driver* variable."
-  [f]
-  (with-chrome {:headless true} driver
-    (binding [*driver* driver]
-      (f))))
 (def test-sys (user/test-system))
 
 (use-fixtures
@@ -53,26 +37,13 @@
             (finally
               (alter-var-root #'test-sys component/stop)))))
 
-(comment
-  (use-fixtures
-  :once (fn [tests]
-          (let [test-sys (make-system ...)]
-            (try
-              (component/start test-sys)
-              (with-chrome-headless nil  driver
-                (binding [*driver* driver]
-                  (tests)))
-              (finally
-                (component/stop test-sys)))))))
 
-#_(def driver (chrome))
-;; (has-text? driver "Register")
 
-;;(def driver (chrome-headless))
-
-;;(quit driver)
-
-;(component/update-system (user/test-system))
+(deftest check
+  (testing "right"
+    (is (= 4 (+ 2 2))))
+  (testing "wrong.."
+    (is (= 5 (+ 2 2)))))
 
 (deftest home
   (testing "register element without session"
@@ -83,56 +54,49 @@
                      )))))
     (is (= "Home" (with-chrome-headless nil driver
                                 (go driver (test-url "/"))
-             (get-title driver)))))
-  )
+             (get-title driver))))))
 
-(deftest check
-  (testing "right"
-    (is (= 4 (+ 2 2))))
-  (testing "wrong.."
-    (is (= 5 (+ 2 2)))))
-
+(deftest admin-login
+  (testing "Log-in as admin"
+    (is (= true
+           (with-chrome-headless nil driver
+             (doto driver
+               (go (test-url "/"))
+               (click {:tag :a :fn/has-text "Login"})
+               (fill {:tag :input :name :username} "admin")
+               (fill {:tag :input :name :password} "admin")
+               (click {:tag :input :type :submit})
+               )
+             (has-text? driver "Hello admin!")
+             ))))
+  (testing "Add an entry as admin"
+    (is (= true
+           (with-chrome-headless nil driver
+             (doto driver
+               (go (test-url "/login"))
+               (fill {:tag :input :name :username} "admin")
+               (fill {:tag :input :name :password} "admin")
+               (click {:tag :input :type :submit})
+               (go (app-url "/invoices-insert"))
+               (fill {:tag :input :name :amount} "666")
+               (click {:tag :input :type :submit}))
+             (has-text? driver "666@"))))))
 
 (comment
   (run-tests)
   )
 
 (comment
-
-  ;; let's perform a quick Wiki session
-
-  (go driver "https://en.wikipedia.org/")
-  (wait-visible driver [{:id :simpleSearch} {:tag :input :name :search}])
-
-  ;; search for something
-  (fill driver {:tag :input :name :search} "Clojure programming language")
-  (fill driver {:tag :input :name :search} k/enter)
-  (wait-visible driver {:class :mw-search-results})
-
-  ;; I'm sure the first link is what I was looking for
-  (click driver [{:class :mw-search-results} {:class :mw-search-result-heading} {:tag :a}])
-  (wait-visible driver {:id :firstHeading})
-
-  ;; let's ensure
-  (get-url driver) ;; "https://en.wikipedia.org/wiki/Clojure"
-
-  (get-title driver) ;; "Clojure - Wikipedia"
-
-  (has-text? driver "Clojure") ;; true
-
-  ;; navigate on history
-  (back driver)
-  (forward driver)
-  (refresh driver)
-  (get-title driver) ;; "Clojure - Wikipedia"
-
-  ;; stops Firefox and HTTP server
-  (quit driver)
-
-  ;; You see, any function requires a driver instance as the first argument. So you may simplify it using doto macros:
-
-  #_(def driver (chrome)))
-
+  ;;BUILDING A TEST
+  (def driver (chrome))
+  (go driver (app-url "/login"))
+  (fill driver {:tag :input :name :username} "noah")
+  (fill driver {:tag :input :name :password} "conoy")
+  (click driver {:tag :input :type :submit})
+  (go driver (app-url "/invoices-insert"))
+  (fill driver {:tag :input :name :amount} "666")
+  (click driver {:tag :input :type :submit})
+  (has-text? driver "666@"))
 
 (comment
   (doto driver
