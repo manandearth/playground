@@ -26,7 +26,7 @@
   (::http/service-fn (http/create-servlet (assoc service/service
                                                            ::http/enable-session {:store session-store}))))
 
-(deftest stub-session-store-test
+#_(deftest stub-session-store-test
   (let [expected-id "boo"
         session-store (make-session-store (constantly {:id expected-id})
                                           (constantly nil)

@@ -5,17 +5,38 @@
             [sparkledriver.element :as sde :refer [click! send-text!]]))
 
 
-(use-fixtures :once wrap-test-system wrap-browser)
+#_(use-fixtures :once wrap-test-system wrap-browser)
 
-#_(deftest sign-up-test
-    (fetch! (app-url "/"))
-    (click! (find-by-xpath "//a[text()='Login']"))
-    (is (= (current-path) "/")))
+;; (deftest sign-up-test
+;;     (fetch! (app-url "/"))
+;;     (click! (find-by-xpath "//a[text()='Login']"))
+;;     (is (= (current-path) "/")))
+;; _
 
-(deftest home
-  (fetch! (app-url "/"))
-  (println (page-text)))
+#_(deftest home
+  #_(testing "loading the page"
+    (fetch! (app-url "/")))
+  (testing "first div tag"
+    (is  (= "[ Home | About | All Entries | Register | Login ]\nHello World!"
+            (fetch! (app-url "/"))
+            (find-by-tag "div")))))
+  
+
+(deftest basic-tests
+  (sd/with-browser [browser (fetch! (sd/make-browser) (str "http:/localhost:" 8080))]
+    (testing "loads the page"
+        (is (= 200 (sd/status-code browser))))))
+
+
+
+
+
 
 (comment
   (run-tests)
   )
+
+#_(sd/with-browser [browser (fetch! (sd/make-browser)
+                                  "http://localhost:8080")]
+  (find-by-tag browser "div"))
+

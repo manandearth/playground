@@ -185,7 +185,7 @@
 
 ;; Consumed by playground.server/create-server
 ;; See http/default-interceptors for additional options you can configure
-(def service
+(defn service [port]
   {:env                     :prod
    ;; You can bring your own non-default interceptors. Make
    ;; sure you include routing and set it up right for
@@ -216,7 +216,7 @@
    ;; This can also be your own chain provider/server-fn -- http://pedestal.io/reference/architecture-overview#_chain_provider
    ::http/type              :jetty
    ;; ::http/host "localhost"
-   ::http/port              8080
+   ::http/port              port
    ;; Options to pass to the container (Jetty)
    ::http/container-options {:h2c? true
                              :h2?  false

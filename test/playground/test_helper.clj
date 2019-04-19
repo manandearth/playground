@@ -23,52 +23,24 @@
 
 (def browser (sd/make-browser))
 
-(sd/fetch! browser "http://localhost:8080")
+;; (sd/fetch! browser "http://localhost:8080")
 
-(sd/current-url browser)
+;; (sd/current-url browser)
 
-(sd/page-source browser)
+;; (sd/page-source browser)
 
-(sd/page-text browser)
-
-
-
-
-
-
-
-(defn test-config []
-  {:http-port test-http-port
-   :db-path (temp-file-name "test" "db")})
-
-(defn rehardened-reset []
-  (do
-    (clojure.core/require 'clojure.tools.namespace.repl)
-    (clojure.core/require 'com.stuartsierra.component.repl)
-    ((clojure.core/resolve 'clojure.tools.namespace.repl/set-refresh-dirs) "src" "test")
-    (try
-      ((clojure.core/resolve 'com.stuartsierra.component.repl/reset))
-      (catch java.lang.Throwable v
-        (clojure.core/when (clojure.core/instance? java.io.FileNotFoundException v)
-          ((clojure.core/resolve 'clojure.tools.namespace.repl/clear)))
-        (clojure.core/when ((clojure.core/resolve 'com.stuartsierra.component/ex-component?) v)
-          (clojure.core/let [stop (clojure.core/resolve 'com.stuartsierra.component/stop)]
-            (clojure.core/some-> v clojure.core/ex-data :system stop)))
-        (throw v)))))
-
+;; (sd/page-text browser)
 
 
 (defn wrap-test-system
   "A fixture function which sets up the system before tests and tears it down afterwards."
   [tests]
-  (let [config (test-config)
-        system (user/dev-system)]
-     (set-init (fn [_]
-                     (user/dev-system)))
-    (rehardened-reset)
+  (let [system (component/start user/test-system)]
     (tests)
-    (component/stop system)
-    #_(io/delete-file (:db-path config)))) 
+    (component/stop user/test-system)
+    #_(io/delete-file (:db-path config))))
+
+(def browser (sd/make-browser))
 
 (defn wrap-browser [tests]
   "A fixture function which binds *browser* to a new browser instance."
@@ -96,6 +68,12 @@
   ([browser xpath]
    (sde/find-by-xpath browser xpath)))
 
+(defn find-by-tag
+  ([tag]
+   (sde/find-by-tag *browser* tag))
+  ([browser tag]
+   (sde/find-by-tag browser tag)))
+
 (defn page-text
   ([]
    (sd/page-text *browser*))
@@ -111,9 +89,20 @@
 (defn current-path []
   (:path (uri/uri (sd/current-url *browser*))))
 
+(comment
+  ;;example:
+  (sd/with-browser [browser (sd/make-browser)]
+    (-> (sd/fetch! browser "http://clojure.org")
+        (sde/find-by-xpath* "//div[@class='clj-intro-message']/p")
+        (nth 2)
+        sde/text)))
 
-(sd/with-browser [browser (sd/make-browser)]
-  (-> (sd/fetch! browser "http://clojure.org")
-      (sde/find-by-xpath* "//div[@class='clj-intro-message']/p")
-      (nth 2)
-      sde/text))
+#_(sd/with-browser [browser (sd/make-browser)]
+  (-> (fetch! browser "http://localhost:8080/")
+      (sde/find-by-xpath* "//div")))
+   
+
+#_(sde/click! (find-by-xpath))
+#_(sde/find-by-xpath "Login")
+        
+

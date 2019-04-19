@@ -40,6 +40,8 @@ It requires to have the following namespaces required:
 
 For the service.invoices ns create a table:
 
+`CREATE TABLE users (id SERIAL, email VARCHAR(50), author VARCHAR(20));`
+
 and register table that keeps auth login data:
 
 `CREATE TABLE register ( username VARCHAR(20), password VARCHAR(100), role VARCHAR(20) DEFAULT 'user');`
@@ -47,4 +49,13 @@ and register table that keeps auth login data:
 to alter role to admin:
 
 `UPDATE register SET ROLE = 'admin' WHERE username = 'foo';`
+
+
+## TESTS
+
+### sparkledriver
+
+`Sparkledriver` tests use `test-system` as system.
+
+Create a parallel db with same tables (i.e users, register).
 
