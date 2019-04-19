@@ -1,107 +1,112 @@
 (ns playground.test-helper
-  (:require #_[sparkledriver.browser :as sd]
-            #_[sparkledriver.element :as sde]
-            [playground.server :as server]
-            [playground.service :as service]
-            [user]
-            #_[booklog.application :as app]
-            [com.stuartsierra.component :as component]
-            [com.stuartsierra.component.repl :refer [set-init]]
-            [clojure.java.io :as io]
-            [lambdaisland.uri :as uri]
-            #_[booklog.components.spicerack :as sc]))
+  (:require  [clojure.test :refer :all]
+             [playground.server :as server]
+             [playground.service :as service]
+             [user]
+             [com.stuartsierra.component :as component]
+             [com.stuartsierra.component.repl :refer [start stop set-init]]
+             [clojure.java.io :as io]
+             [lambdaisland.uri :as uri]
+             [etaoin.api :refer :all]
+             [etaoin.keys :as k]
+             ))
 
-;; ;;FIXME should perhaps go in a different ns (a sin LambdaIsland example)
-;; (defn temp-file-name [name ext]
-;;   (str (io/file (System/getProperty "java.io.tmpdir")
-;;                 (str name (rand-int 99999) "." ext))))
+;;manipulate urls
 
+(def ^:dynamic *driver*)
 
-;; (def test-http-port 59800)
+(def test-port 59800)
 
-;; (def ^:dynamic *browser* nil )
+(def app-port 8080)
 
-;; (def browser (sd/make-browser))
+(defn test-url [path]
+  (str "http://localhost:" test-port path))
 
-;; ;; (sd/fetch! browser "http://localhost:8080")
+(defn app-url [path]
+  (str "http://localhost:" app-port path))
 
-;; ;; (sd/current-url browser)
+(def test-sys (user/test-system))
 
-;; ;; (sd/page-source browser)
+(use-fixtures
+  :once (fn [tests]
+          (try
+            (alter-var-root #'test-sys component/start)
+            (with-chrome-headless nil  driver
+              (binding [*driver* driver]
+                (tests)))
+            (finally
+              (alter-var-root #'test-sys component/stop)))))
 
-;; ;; (sd/page-text browser)
+(deftest check
+  (testing "right"
+    (is (= 4 (+ 2 2))))
+  (testing "wrong.."
+    (is (= 5 (+ 2 2)))))
 
+(deftest home
+  (testing "register element without session"
+    (is (= clojure.lang.Atom (type (with-chrome-headless nil driver
+                   (doto driver
+                     (go (test-url "/"))
+                     (has-text? "Hello")
+                     )))))
+    (is (= "Home" (with-chrome-headless nil driver
+                                (go driver (test-url "/"))
+             (get-title driver))))))
 
-;; (defn wrap-test-system
-;;   "A fixture function which sets up the system before tests and tears it down afterwards."
-;;   [tests]
-;;   (let [system (component/start user/test-system)]
-;;     (tests)
-;;     (component/stop user/test-system)
-;;     #_(io/delete-file (:db-path config))))
-;; (def browser (sd/make-browser))
+(deftest admin-login
+  (testing "Log-in as admin"
+    (is (= true
+           (with-chrome-headless nil driver
+             (doto driver
+               (go (test-url "/"))
+               (click {:tag :a :fn/has-text "Login"})
+               (fill {:tag :input :name :username} "admin")
+               (fill {:tag :input :name :password} "admin")
+               (click {:tag :input :type :submit})
+               )
+             (has-text? driver "Hello admin!")
+             ))))
+  (testing "Add an entry as admin"
+    (is (= true
+           (with-chrome-headless nil driver
+             (doto driver
+               (go (test-url "/login"))
+               (fill {:tag :input :name :username} "admin")
+               (fill {:tag :input :name :password} "admin")
+               (click {:tag :input :type :submit})
+               (go (app-url "/invoices-insert"))
+               (fill {:tag :input :name :amount} "666")
+               (click {:tag :input :type :submit}))
+             (has-text? driver "666@"))))))
 
-;; (defn wrap-browser [tests]
-;;   "A fixture function which binds *browser* to a new browser instance."
-;;   (sd/with-browser [browser (sd/make-browser)]
-;;     (binding [*browser* browser]
-;;       (tests))))
+(comment
+  (run-tests)
+  )
 
-;; ;;multifunctions for passing a browser instance
-;; ;;or it uses implicitly the dynamic *browser* var 
-;; (defn fetch!
-;;   ([url]
-;;    (sd/fetch! *browser* url))
-;;   ([browser url]
-;;    (sd/fetch! browser url)))
+(comment
+  ;;BUILDING A TEST
+  (def driver (chrome))
+  (go driver (app-url "/login"))
+  (fill driver {:tag :input :name :username} "noah")
+  (fill driver {:tag :input :name :password} "conoy")
+  (click driver {:tag :input :type :submit})
+  (go driver (app-url "/invoices-insert"))
+  (fill driver {:tag :input :name :amount} "666")
+  (click driver {:tag :input :type :submit})
+  (has-text? driver "666@"))
 
-;; (defn find-by-css
-;;   ([css]
-;;    (sde/find-by-css *browser* css))
-;;   ([browser css]
-;;    (sde/find-by-css browser css)))
+(comment
+  (doto driver
+    (go "https://en.wikipedia.org/")
+    (wait-visible [{:id :simpleSearch} {:tag :input :name :search}])
+    ;; ...
+    (fill {:tag :input :name :search} k/enter)
+    (wait-visible {:class :mw-search-results})
+    (click :some-button)
+    ;; ...
+    (wait-visible {:id :firstHeading})
+    ;; ...
+    (quit)))
 
-;; (defn find-by-xpath
-;;   ([xpath]
-;;    (sde/find-by-xpath *browser* xpath))
-;;   ([browser xpath]
-;;    (sde/find-by-xpath browser xpath)))
-
-;; (defn find-by-tag
-;;   ([tag]
-;;    (sde/find-by-tag *browser* tag))
-;;   ([browser tag]
-;;    (sde/find-by-tag browser tag)))
-
-;; (defn page-text
-;;   ([]
-;;    (sd/page-text *browser*))
-;;   ([browser]
-;;    (sd/page-text browser)))
-
-;; ;;manipulate urls
-;; (defn app-url [path]
-;;   (assoc  (uri/uri "http://localhost")
-;;           :path path
-;;           :port test-http-port))
-
-;; (defn current-path []
-;;   (:path (uri/uri (sd/current-url *browser*))))
-
-;; (comment
-;;   ;;example:
-;;   (sd/with-browser [browser (sd/make-browser)]
-;;     (-> (sd/fetch! browser "http://clojure.org")
-;;         (sde/find-by-xpath* "//div[@class='clj-intro-message']/p")
-;;         (nth 2)
-;;         sde/text)))
-
-;; #_(sd/with-browser [browser (sd/make-browser)]
-;;   (-> (fetch! browser "http://localhost:8080/")
-;;       (sde/find-by-xpath* "//div")))
-   
-
-;; #_(sde/click! (find-by-xpath))
-;; #_(sde/find-by-xpath "Login")
-        
 
