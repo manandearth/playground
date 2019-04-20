@@ -24,7 +24,7 @@
 
 (def test-map
   (-> (service/service 59800) ;; TEST configuration
-      (merge {:env                     :dev
+      (merge {:env                     :test
               ;; do not block thread that starts web server
               ::server/join?           false
               ;; Routes can be a function that resolve routes,

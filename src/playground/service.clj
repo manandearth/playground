@@ -28,9 +28,6 @@
    [buddy.auth :refer [authenticated?]]
    [buddy.hashers :as hashers]))
 
-(defn test-page [request]
-  (ring-resp/response (str (get-in request [:session :identity :username]))))
-
 (defn about-page [request]
   (ring-resp/response (views/about request)))
 
@@ -128,6 +125,9 @@
                     interceptor-chain/terminate)
                 (assoc-in context [:request params-key] result))))})
 
+(def test-port 59800)
+(def dev-port 8080)
+
 (defn context-injector [components]
   {:enter (fn [{:keys [request] :as context}]
             (reduce (fn [v component]
@@ -135,6 +135,8 @@
                     context
                     components))
    :name  ::context-injector})
+
+(pedestal-component/using-component [:db])
 
 (def components-to-inject [:db
                            #_:background-processor #_:enqueuer])
@@ -153,7 +155,6 @@
   "Tabular routes"
   #{["/" :get (conj common-interceptors `home-page) :route-name :home]
     ["/about" :get (conj common-interceptors `about-page)]
-    ["/test" :get (conj common-interceptors `test-page)]
     ["/api" :get (into component-interceptors [http/json-body (param-spec-interceptor ::api :query-params) `api])]
     ;;FIXME change the routes definition format from: (def routes #{...})
     ;;to (def routes (io.pedestal.http.route.definition.table/table-routes ...))

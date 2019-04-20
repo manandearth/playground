@@ -6,7 +6,6 @@
              [com.stuartsierra.component :as component]
              [com.stuartsierra.component.repl :refer [start stop set-init]]
              [clojure.java.io :as io]
-             [lambdaisland.uri :as uri]
              [etaoin.api :refer :all]
              [etaoin.keys :as k]
              ))
@@ -36,12 +35,6 @@
                 (tests)))
             (finally
               (alter-var-root #'test-sys component/stop)))))
-
-(deftest check
-  (testing "right"
-    (is (= 4 (+ 2 2))))
-  (testing "wrong.."
-    (is (= 5 (+ 2 2)))))
 
 (deftest home
   (testing "register element without session"
@@ -80,6 +73,7 @@
                (click {:tag :input :type :submit}))
              (has-text? driver "666@"))))))
 
+
 (comment
   (run-tests)
   )
@@ -94,19 +88,6 @@
   (go driver (app-url "/invoices-insert"))
   (fill driver {:tag :input :name :amount} "666")
   (click driver {:tag :input :type :submit})
-  (has-text? driver "666@"))
-
-(comment
-  (doto driver
-    (go "https://en.wikipedia.org/")
-    (wait-visible [{:id :simpleSearch} {:tag :input :name :search}])
-    ;; ...
-    (fill {:tag :input :name :search} k/enter)
-    (wait-visible {:class :mw-search-results})
-    (click :some-button)
-    ;; ...
-    (wait-visible {:id :firstHeading})
-    ;; ...
-    (quit)))
-
+  (has-text? driver "666@")
+  )
 

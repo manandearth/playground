@@ -53,7 +53,7 @@
 (defn test-system
   []
   (component/system-map
-   :service-map playground.server/dev-map
+   :service-map playground.server/test-map
    ;; :background-processor (background-processor/new :queue-name "cljtest")
    ;; :enqueuer (enqueuer/new :queue-name "cljtest")
    :db (modular.postgres/map->Postgres {:url      (if vemv?
