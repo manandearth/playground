@@ -125,9 +125,6 @@
                     interceptor-chain/terminate)
                 (assoc-in context [:request params-key] result))))})
 
-(def test-port 59800)
-(def dev-port 8080)
-
 (defn context-injector [components]
   {:enter (fn [{:keys [request] :as context}]
             (reduce (fn [v component]
@@ -135,8 +132,6 @@
                     context
                     components))
    :name  ::context-injector})
-
-(pedestal-component/using-component [:db])
 
 (def components-to-inject [:db
                            #_:background-processor #_:enqueuer])

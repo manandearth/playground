@@ -14,15 +14,11 @@
 
 (def ^:dynamic *driver*)
 
-(def test-port 59800)
-
-(def app-port 8080)
-
 (defn test-url [path]
-  (str "http://localhost:" test-port path))
+  (str "http://localhost:" server/test-http-port path))
 
 (defn app-url [path]
-  (str "http://localhost:" app-port path))
+  (str "http://localhost:" server/dev-http-port path))
 
 (def test-sys (user/test-system))
 

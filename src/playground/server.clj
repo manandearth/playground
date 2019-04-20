@@ -7,8 +7,11 @@
    [playground.service :as service]
    ))
 
+(def dev-http-port 8080)
+(def test-http-port 59800)
+
 (def dev-map
-  (-> (service/service 8080) ;; start with production configuration
+  (-> (service/service dev-http-port) ;; start with production configuration
       (merge {:env                     :dev
               ;; do not block thread that starts web server
               ::server/join?           false
@@ -23,7 +26,7 @@
       server/dev-interceptors))
 
 (def test-map
-  (-> (service/service 59800) ;; TEST configuration
+  (-> (service/service test-http-port) ;; TEST configuration
       (merge {:env                     :test
               ;; do not block thread that starts web server
               ::server/join?           false
