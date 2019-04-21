@@ -17,9 +17,6 @@
 (defn test-url [path]
   (str "http://localhost:" server/test-http-port path))
 
-(defn app-url [path]
-  (str "http://localhost:" server/dev-http-port path))
-
 (def test-sys (user/test-system))
 
 (use-fixtures
@@ -64,7 +61,7 @@
                (fill {:tag :input :name :username} "admin")
                (fill {:tag :input :name :password} "admin")
                (click {:tag :input :type :submit})
-               (go (app-url "/invoices-insert"))
+               (go (test-url "/invoices-insert"))
                (fill {:tag :input :name :amount} "666")
                (click {:tag :input :type :submit}))
              (has-text? driver "666@"))))))
@@ -76,6 +73,10 @@
 
 (comment
   ;;BUILDING A TEST
+
+  (defn app-url [path]
+    (str "http://localhost:" server/dev-http-port path))
+  
   (def driver (chrome))
   (go driver (app-url "/login"))
   (fill driver {:tag :input :name :username} "noah")
