@@ -15,12 +15,10 @@
 (def url-for (route/url-for-routes
               (route/expand-routes playground.service/routes)))
 
-(def system
-  ;;com.stuartsierra.component.repl/system
-  user/test-system)
-(def service (user/service-fn system))
+#_(def system com.stuartsierra.component.repl/system)
+#_(def service (user/service-fn system))
 
-(deftest pedestal-example
+#_(deftest pedestal-example
   (testing
       "update an entry without login"
       (is (= (or 403 404) (:status (response-for service
