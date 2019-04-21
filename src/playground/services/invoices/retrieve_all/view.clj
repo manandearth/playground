@@ -18,8 +18,7 @@
                        (if (= :id label-key)
                          [:a {:href (url-for :invoices/:id :path-params {:id v})} v]
                          (if (= :delete label-key)
-                           [:a {:href
-                                  (url-for :invoices-delete/:id :path-params {:id v})}"delete"]
+                           [:a {:id (str "delete-" v) :href (url-for :invoices-delete/:id :path-params {:id v})}"delete"]
                            v)))}
            extended-context (map #(assoc % :delete (:id %)) context)]
        (table/to-table1d

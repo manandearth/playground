@@ -64,7 +64,21 @@
                (go (test-url "/invoices-insert"))
                (fill {:tag :input :name :amount} "666")
                (click {:tag :input :type :submit}))
-             (has-text? driver "666@"))))))
+             (has-text? driver "666@")))))
+  (testing "Delete entry as admin"
+    ;;FIXME need to find the path for click.
+    (is (= true
+           (with-chrome-headless nil driver
+             (doto driver
+               (go (test-url "/login"))
+               (fill {:tag :input :name :username} "admin")
+               (fill {:tag :input :name :password} "admin")
+               (click {:tag :input :type :submit})
+               (go (test-url "/invoices"))
+               (click [{:tag :tbody} {:tag :td :index 4} {:tag :a}])
+               (wait 1))
+             (has-text? driver "has beed deleted.")
+             )))))
 
 
 (comment
@@ -82,9 +96,10 @@
   (fill driver {:tag :input :name :username} "noah")
   (fill driver {:tag :input :name :password} "conoy")
   (click driver {:tag :input :type :submit})
-  (go driver (app-url "/invoices-insert"))
+  (go driver (app-url "/invoices"))
+  (query driver [{:tag :tbody} {:tag :a}])
   (fill driver {:tag :input :name :amount} "666")
   (click driver {:tag :input :type :submit})
-  (has-text? driver "666@")
-  )
+  (has-text? driver "666@"))
+  
 
