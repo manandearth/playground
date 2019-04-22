@@ -66,8 +66,7 @@
                (click {:tag :input :type :submit}))
              (has-text? driver "666@")))))
   (testing "Delete entry as admin"
-    ;;FIXME need to find the path for click.
-    #_(is (= true
+    (is (= true
            (with-chrome-headless nil driver
              (doto driver
                (go (test-url "/login"))
