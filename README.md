@@ -53,9 +53,19 @@ to alter role to admin:
 
 ## TESTS
 
-### sparkledriver
+### etaoin
 
-`Sparkledriver` tests use `test-system` as system.
+`etaoin` tests uses `user/test-system`.
 
 Create a parallel db with same tables (i.e users, register).
+
+populate the register table with:
+
+| username | password | role  |
+|----------+----------+-------|
+| admin    | admin    | admin |
+| user     | user     | user  |
+
+
+
 

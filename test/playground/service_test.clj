@@ -18,7 +18,20 @@
 #_(def system com.stuartsierra.component.repl/system)
 #_(def service (user/service-fn system))
 
-#_(deftest pedestal-example
+
+;FIXME I repeat the def for sys and use-fixture.
+(def test-sys (user/test-system))
+
+(use-fixtures
+  :once (fn [tests]
+          (try
+            (alter-var-root #'test-sys component/start)
+            (tests)
+            (finally
+              (alter-var-root #'test-sys component/stop)))))
+
+;;TODO - how to represent the test-system in this ns? 
+(deftest pedestal-example
   (testing
       "update an entry without login"
       (is (= (or 403 404) (:status (response-for service
