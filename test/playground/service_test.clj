@@ -15,42 +15,34 @@
 (def url-for (route/url-for-routes
               (route/expand-routes playground.service/routes)))
 
-#_(def system com.stuartsierra.component.repl/system)
-#_(def service (user/service-fn system))
+(defmacro with-system
+  [[bound-var binding-expr] & body]
+  `(let [~bound-var (component/start ~binding-expr)]
+     (try
+       ~@body
+       (finally
+         (component/stop ~bound-var)))))
+
+(deftest home-test
+  (with-system [sut (user/test-system)]                       
+    (let [service               (user/service-fn sut)                 
+          {:keys [status body]} (response-for service
+                                              :get
+                                              (url-for :home))] 
+      (is (= 200 status))                                        
+      (is (= "<!DOCTYPE html>\n<html><head><title>Home</title></head><div>[ <a href=\"/\">Home</a> | <a href=\"/about\">About</a> | <a href=\"/invoices\">All Entries</a> | <a href=\"/register\">Register</a> | <a href=\"/login\">Login</a> ]</div><div><h1>Hello World!</h1></div></html>" body)))))                           
 
 
-;FIXME I repeat the def for sys and use-fixture.
-(def test-sys (user/test-system))
-
-(use-fixtures
-  :once (fn [tests]
-          (try
-            (alter-var-root #'test-sys component/start)
-            (tests)
-            (finally
-              (alter-var-root #'test-sys component/stop)))))
-
-;;TODO - how to represent the test-system in this ns? 
 (deftest pedestal-example
-  (testing
-      "update an entry without login"
-      (is (= (or 403 404) (:status (response-for service
-                                                 :get (url-for :invoices/:id
-                                                               :path-params {:id 155})))))))
+  (with-system [sut (user/test-system)]
+    (let [service (user/service-fn sut)
+          {:keys [status body]} (response-for service
+                                              :get
+                                              (url-for :invoices/:id
+                                                       :path-params {:id 25}))]
+      (is (contains? #{403 404} status))
+      (is (.contains body "only permitted to author and admin")))))
 
-
-#_(deftest login
-  (is (= 200 (:status (response-for service
-                                    :get (url-for :login))))))
-
-#_(deftest home-page-test
-  (is (= (-> service (response-for :get "/") :body)
-         "<!DOCTYPE html>\n<html><head><title>Home</title></head><div>[ <a href=\"/\">Home</a> | <a href=\"/about\">About</a> | <a href=\"/invoices\">All Entries</a> | <a href=\"/register\">Register</a> | <a href=\"/login\">Login</a> ]</div><div><h1>Hello World!</h1></div></html>"))
-  )
-
-#_(deftest about-page-test
-  (is (-> service (response-for :get "/about") :body (.contains "Clojure 1.10.0")))
-  )
 
 (comment
   (run-tests)
