@@ -18,7 +18,7 @@
 (defn test-url [path]
   (str "http://localhost:" server/test-http-port path))
 
-(def test-sys (service-test/test-system))
+(def test-sys (service-test/test-system (service-test/test-map)))
 
 (def admin {:username "admin" :password "admin"})
 
