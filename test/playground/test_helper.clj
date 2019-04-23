@@ -1,5 +1,6 @@
 (ns playground.test-helper
   (:require  [clojure.test :refer :all]
+             [playground.service-test :as service-test]
              [playground.server :as server]
              [playground.service :as service]
              [user]
@@ -17,7 +18,7 @@
 (defn test-url [path]
   (str "http://localhost:" server/test-http-port path))
 
-(def test-sys (user/test-system))
+(def test-sys (service-test/test-system))
 
 (def admin {:username "admin" :password "admin"})
 

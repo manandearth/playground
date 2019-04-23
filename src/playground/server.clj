@@ -25,23 +25,6 @@
       server/default-interceptors
       server/dev-interceptors))
 
-(def test-map
-  (-> (service/service test-http-port) ;; TEST configuration
-      (merge {:env                     :test
-              ;; do not block thread that starts web server
-              ::server/join?           false
-              ;; Routes can be a function that resolve routes,
-              ;;  we can use this to set the routes to be reloadable
-              ::server/routes          #(route/expand-routes (deref #'service/routes))
-              ;; all origins are allowed in dev mode
-              ::server/allowed-origins {:creds true :allowed-origins any?}
-              ;; Content Security Policy (CSP) is mostly turned off in dev mode
-              ::server/secure-headers  {:content-security-policy-settings {:object-src "none"}}})
-      server/default-interceptors
-      server/dev-interceptors))
-
-
-
 (defn -main
   "The entry-point for 'lein run'"
   [& args]

@@ -50,26 +50,6 @@
    ;:formatting-stack (formatting-stack.component/map->Formatter {})
    ))
 
-(defn test-system
-  []
-  (component/system-map
-   :service-map playground.server/test-map
-   ;; :background-processor (background-processor/new :queue-name "cljtest")
-   ;; :enqueuer (enqueuer/new :queue-name "cljtest")
-   :db (modular.postgres/map->Postgres {:url      (if vemv?
-                                                    "jdbc:postgresql:ebdb"
-                                                    "jdbc:postgresql:postgres_test")
-                                        :user     (if vemv?
-                                                    "root"
-                                                    "postgres")
-                                        :password (if vemv?
-                                                    ""
-                                                    "postgres")})
-   :pedestal (component/using (pedestal-component/pedestal (constantly playground.server/test-map))
-                              playground.service/components-to-inject)
-   ;:formatting-stack (formatting-stack.component/map->Formatter {})
-   ))
-
 (set-init (fn [_]
             (dev-system)))
 
