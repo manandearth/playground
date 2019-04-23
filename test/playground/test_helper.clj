@@ -19,6 +19,10 @@
 
 (def test-sys (user/test-system))
 
+(def admin {:username "admin" :password "admin"})
+
+(def not-admin {:username "user" :password "user"})
+
 (use-fixtures
   :once (fn [tests]
           (try
@@ -41,43 +45,44 @@
              (get-title driver))))))
 
 (deftest admin-login
-  (testing "Log-in as admin"
-    (is (= true
-           (with-chrome-headless nil driver
-             (doto driver
-               (go (test-url "/"))
-               (click {:tag :a :fn/has-text "Login"})
-               (fill {:tag :input :name :username} "admin")
-               (fill {:tag :input :name :password} "admin")
-               (click {:tag :input :type :submit})
-               )
-             (has-text? driver "Hello admin!")
-             ))))
-  (testing "Add an entry as admin"
-    (is (= true
-           (with-chrome-headless nil driver
-             (doto driver
-               (go (test-url "/login"))
-               (fill {:tag :input :name :username} "admin")
-               (fill {:tag :input :name :password} "admin")
-               (click {:tag :input :type :submit})
-               (go (test-url "/invoices-insert"))
-               (fill {:tag :input :name :amount} "666")
-               (click {:tag :input :type :submit}))
-             (has-text? driver "666@")))))
-  (testing "Delete entry as admin"
-    (is (= true
-           (with-chrome-headless nil driver
-             (doto driver
-               (go (test-url "/login"))
-               (fill {:tag :input :name :username} "admin")
-               (fill {:tag :input :name :password} "admin")
-               (click {:tag :input :type :submit})
-               (go (test-url "/invoices"))
-               (click [{:tag :tbody} {:tag :td :index 4} {:tag :a}])
-               (wait 1))
-             (has-text? driver "has beed deleted.")
-             )))))
+  (let [{:keys [username password]} admin]
+    (testing "Log-in as admin"
+      (is (= true
+             (with-chrome-headless nil driver
+               (doto driver
+                 (go (test-url "/"))
+                 (click {:tag :a :fn/has-text "Login"})
+                 (fill {:tag :input :name :username} username)
+                 (fill {:tag :input :name :password} password)
+                 (click {:tag :input :type :submit})
+                 )
+               (has-text? driver "Hello admin!")
+               ))))
+    (testing "Add an entry as admin"
+      (is (= true
+             (with-chrome-headless nil driver
+               (doto driver
+                 (go (test-url "/login"))
+                 (fill {:tag :input :name :username} username)
+                 (fill {:tag :input :name :password} password)
+                 (click {:tag :input :type :submit})
+                 (go (test-url "/invoices-insert"))
+                 (fill {:tag :input :name :amount} "666")
+                 (click {:tag :input :type :submit}))
+               (has-text? driver "666@")))))
+    (testing "Delete entry as admin"
+      (is (= true
+             (with-chrome-headless nil driver
+               (doto driver
+                 (go (test-url "/login"))
+                 (fill {:tag :input :name :username} username)
+                 (fill {:tag :input :name :password} password)
+                 (click {:tag :input :type :submit})
+                 (go (test-url "/invoices"))
+                 (click [{:tag :tbody} {:tag :td :index 4} {:tag :a}])
+                 (wait 1))
+               (has-text? driver "has beed deleted.")
+               ))))))
 
 
 (comment
