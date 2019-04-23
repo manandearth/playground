@@ -41,9 +41,13 @@
                                               (url-for :invoices/:id
                                                        :path-params {:id 25}))]
       (is (contains? #{403 404} status))
-      (is (.contains body "only permitted to author and admin")))))
+      (is (or (.contains body  "only permitted to author and admin")
+              (.contains body "Entry not in DB"))))))
+
+
 
 
 (comment
   (run-tests)
   )
+

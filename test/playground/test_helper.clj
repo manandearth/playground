@@ -27,11 +27,15 @@
   :once (fn [tests]
           (try
             (alter-var-root #'test-sys component/start)
-            (with-chrome-headless nil  driver
-              (binding [*driver* driver]
-                (tests)))
+            (tests)
             (finally
               (alter-var-root #'test-sys component/stop)))))
+
+(use-fixtures
+  :each (fn [tests]
+          (with-chrome-headless nil driver
+            (binding [*driver* driver]
+              (tests)))))
 
 (deftest home
   (testing "register element without session"
@@ -56,7 +60,7 @@
                  (fill {:tag :input :name :password} password)
                  (click {:tag :input :type :submit})
                  )
-               (has-text? driver "Hello admin!")
+               (has-text? driver (str "Hello " username "!"))
                ))))
     (testing "Add an entry as admin"
       (is (= true
@@ -79,8 +83,7 @@
                  (fill {:tag :input :name :password} password)
                  (click {:tag :input :type :submit})
                  (go (test-url "/invoices"))
-                 (click [{:tag :tbody} {:tag :td :index 4} {:tag :a}])
-                 (wait 1))
+                 (click [{:tag :tbody} {:tag :td :index 4} {:tag :a}]))
                (has-text? driver "has beed deleted.")
                ))))))
 
