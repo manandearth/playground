@@ -31,11 +31,18 @@
                  [hiccup-table "0.2.0"]
                  [buddy/buddy-auth "2.1.0"]
                  [buddy/buddy-hashers "1.3.0"]
-                 [etaoin "0.3.2"]]
+                 [etaoin "0.3.2"]
+                 [joplin.core "0.3.11"]]
   :repl-options {:port 41234}
   :min-lein-version "2.0.0"
-  :resource-paths ["config" "resources"]
+  :resource-paths ["config" "resources" "joplin"]
   :plugins [[cider/cider-nrepl "0.21.1"]]
+  :aliases {"migrate" ["run" "-m" "joplin.alias/migrate" "joplin.edn"]
+            "seed" ["run" "-m" "joplin.alias/seed" "joplin.edn"]
+            "rollback" ["run" "-m" "joplin.alias/rollback" "joplin.edn"]
+            "reset" ["run" "-m" "joplin.alias/reset" "joplin.edn"]
+            "pending" ["run" "-m" "joplin.alias/pending" "joplin.edn"]
+            "create" ["run" "-m" "joplin.alias/create" "joplin.edn"]}
   :profiles {:dev {:dependencies [[io.pedestal/pedestal.service-tools "0.5.3"]
                                   [com.stuartsierra/component.repl "0.2.0"]
                                   [org.clojure/tools.namespace "0.3.0-alpha4"]
