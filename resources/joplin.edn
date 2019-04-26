@@ -1,7 +1,7 @@
-{:migrators    {:sql-mig   "resources/migrations/"}
+{:migrator    {:sql-mig "resources/migrations"}
 
- :seeds        {:sql-seed  "seeds.sql/run"}
+ :seed         {:sql-seed "seeds.sql/run"}
  
- :databases    {:psql-dev  {:type :sql, :url "jdbc:postgresql:postgres@localhost:5432/postgres"}}
+ :db     {:psql-dev {:type :sql, :url "jdbc:postgresql:postgres@localhost:5432/postgres"}}
 
  :environments {:dev       [{:db :psql-dev, :migrator :sql-mig, :seed :sql-seed}]}}
