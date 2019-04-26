@@ -2,6 +2,6 @@
 
  :seeds        {:sql-seed  "seeds.sql/run"}
  
- :databases    {:psql-dev  {:type :sql, :url  ["postgresql:postgres@localhost:5432/postgres"]}}
+ :databases    {:psql-dev  {:type :sql, :url "jdbc:postgresql:postgres@localhost:5432/postgres"}}
 
  :environments {:dev       [{:db :psql-dev, :migrator :sql-mig, :seed :sql-seed}]}}

@@ -32,10 +32,11 @@
                  [buddy/buddy-auth "2.1.0"]
                  [buddy/buddy-hashers "1.3.0"]
                  [etaoin "0.3.2"]
-                 [joplin.core "0.3.11"]]
+                 [joplin.core "0.3.11"]
+                 [joplin.jdbc "0.3.11"]]
   :repl-options {:port 41234}
   :min-lein-version "2.0.0"
-  :resource-paths ["config" "resources" "joplin"]
+  :resource-paths ["config" "resources"]
   :plugins [[cider/cider-nrepl "0.21.1"]]
   :aliases {"migrate" ["run" "-m" "joplin.alias/migrate" "joplin.edn"]
             "seed" ["run" "-m" "joplin.alias/seed" "joplin.edn"]
