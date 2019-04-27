@@ -57,6 +57,10 @@ To update a registered user role to admin:
 
 `UPDATE register SET ROLE = 'admin' WHERE username = 'foo';`
 
+For the tests create a parallel db then the tables using:
+`lein reset test psql-test` 
+
+The db connection url is configured in: `resources/jopin.edn`
 
 ## TESTS
 
