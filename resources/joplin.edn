@@ -1,9 +1,9 @@
-{:migrators    {:sql-mig    "resources/migrations"}
+{:migrators    {:sql-mig    "/migrations"}
 
  :seeds        {:sql-seed  "seeds.sql/run"}
  
- :databases    {:psql-dev  {:type :sql, :url "jdbc:postgresql:postgres?user=postgres&password=postgres"}
-                :psql-test {:type :sql, :url "jdbc:postgresql:postgres_test?user=postgres&password=postgres"}}
+ :databases    {:psql-dev  {:type :sql, :url "jdbc:postgresql:playground_dev?user=postgres&password=postgres"}
+                :psql-test {:type :sql, :url "jdbc:postgresql:playground_test?user=postgres&password=postgres"}}
 
  :environments {:dev       [{:db :psql-dev,  :migrator :sql-mig, :seed :sql-seed}]
                 :test      [{:db :psql-test, :migrator :sql-mig, :seed :sql-seed}]}

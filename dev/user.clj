@@ -38,7 +38,7 @@
    ;; :enqueuer (enqueuer/new :queue-name "cljtest")
    :db (modular.postgres/map->Postgres {:url      (if vemv?
                                                     "jdbc:postgresql:ebdb"
-                                                    "jdbc:postgresql:postgres")
+                                                    "jdbc:postgresql:playground_dev")
                                         :user     (if vemv?
                                                     "root"
                                                     "postgres")
