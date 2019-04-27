@@ -36,17 +36,24 @@ It requires to have the following namespaces required:
 
 ## DB
 
-`[juxt.modular/postgres "0.0.1-SNAPSHOT"]` works on PostgreSQL upto verion 9.6 and **not** later..
+Playground is using `[juxt.modular/postgres "0.0.1-SNAPSHOT"]` which works on PostgreSQL upto verion 9.6 and **not** later..
 
-For the service.invoices ns create a table:
+### Migration
 
-`CREATE TABLE users (id SERIAL, email VARCHAR(50), author VARCHAR(20));`
+The original creation of the tables and migrations are managed with [joplin](https://github.com/juxt/joplin) 
 
-and register table that keeps auth login data:
+To first set up (for example a dev postgres environment) run thew following in a shell:
+`lein reset dev psql-dev`
 
-`CREATE TABLE register ( username VARCHAR(20), password VARCHAR(100), role VARCHAR(20) DEFAULT 'user');`
+This will create the following:
 
-to alter role to admin:
+`CREATE TABLE users (id SERIAL, email VARCHAR(50), author VARCHAR(20))
+;--
+CREATE TABLE register ( username VARCHAR(20), password VARCHAR(100), role VARCHAR(20) DEFAULT 'user');`
+
+It will also insert an admin `{:username "admin" :password "admin"}` and 5 mock entries to the :users table 
+
+To update a registered user role to admin:
 
 `UPDATE register SET ROLE = 'admin' WHERE username = 'foo';`
 
