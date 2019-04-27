@@ -42,20 +42,8 @@ Playground is using `[juxt.modular/postgres "0.0.1-SNAPSHOT"]` which works on Po
 
 The original creation of the tables and migrations are managed with [joplin](https://github.com/juxt/joplin) 
 
-To first set up (for example a dev postgres environment) run thew following in a shell:
+To first set up (for example a dev postgres environment) run the following in a shell:
 `lein reset dev psql-dev`
-
-This will create the following:
-
-`CREATE TABLE users (id SERIAL, email VARCHAR(50), author VARCHAR(20))
-;--
-CREATE TABLE register ( username VARCHAR(20), password VARCHAR(100), role VARCHAR(20) DEFAULT 'user');`
-
-It will also insert an admin `{:username "admin" :password "admin"}` and 5 mock entries to the :users table 
-
-To update a registered user role to admin:
-
-`UPDATE register SET ROLE = 'admin' WHERE username = 'foo';`
 
 For the tests create a parallel db then the tables using:
 `lein reset test psql-test` 
