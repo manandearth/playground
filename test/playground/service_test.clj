@@ -1,20 +1,20 @@
 (ns playground.service-test
-  (:require [io.pedestal.http :as http]
-            [io.pedestal.http.route :as route]
-            [io.pedestal.test :refer [response-for]]
-            [io.pedestal.http.route.definition.table :refer [table-routes]]
-            [io.pedestal.http :as http]
-            [com.stuartsierra.component :as component]
-            [clojure.test :refer :all]
-            [buddy.core.codecs :as codecs]
-            [buddy.core.codecs.base64 :as base64]
-            [user]
-            [playground.server :as server]
-            [playground.service :as service]
-            [ring.middleware.session.store :as session.store]
-            [playground.service :as service]
-            [com.grzm.component.pedestal :as pedestal-component]))
-
+  (:require
+   [buddy.core.codecs :as codecs]
+   [buddy.core.codecs.base64 :as base64]
+   [clojure.test :refer :all]
+   [com.grzm.component.pedestal :as pedestal-component]
+   [com.stuartsierra.component :as component]
+   [io.pedestal.http :as http]
+   [io.pedestal.http :as http]
+   [io.pedestal.http.route :as route]
+   [io.pedestal.http.route.definition.table :refer [table-routes]]
+   [io.pedestal.test :refer [response-for]]
+   [playground.server :as server]
+   [playground.service :as service]
+   [playground.service :as service]
+   [ring.middleware.session.store :as session.store]
+   [user]))
 
 (defn test-map [& session-store]
   (-> (service/service server/test-http-port) ;; TEST configuration
@@ -28,8 +28,7 @@
               ::http/allowed-origins {:creds true :allowed-origins any?}
               ;; Content Security Policy (CSP) is mostly turned off in dev mode
               ::http/secure-headers  {:content-security-policy-settings {:object-src "none"}}
-              ::http/enable-session (if (seq session-store) {:session session-store} nil)
-              })
+              ::http/enable-session (if (seq session-store) {:session session-store} nil)})
       http/default-interceptors
       http/dev-interceptors))
 
@@ -78,14 +77,13 @@
          (component/stop ~bound-var)))))
 
 (deftest home-test
-  (with-system [sut (test-system (test-map))]                       
-    (let [service               (user/service-fn sut)                 
+  (with-system [sut (test-system (test-map))]
+    (let [service               (user/service-fn sut)
           {:keys [status body]} (response-for service
                                               :get
-                                              (url-for :home))] 
-      (is (= 200 status))                                        
-      (is (= "<!DOCTYPE html>\n<html><head><title>Home</title></head><div>[ <a href=\"/\">Home</a> | <a href=\"/about\">About</a> | <a href=\"/invoices\">All Entries</a> | <a href=\"/register\">Register</a> | <a href=\"/login\">Login</a> ]</div><div><h1>Hello World!</h1></div></html>" body)))))                           
-
+                                              (url-for :home))]
+      (is (= 200 status))
+      (is (= "<!DOCTYPE html>\n<html><head><title>Home</title></head><div>[ <a href=\"/\">Home</a> | <a href=\"/about\">About</a> | <a href=\"/invoices\">All Entries</a> | <a href=\"/register\">Register</a> | <a href=\"/login\">Login</a> ]</div><div><h1>Hello World!</h1></div></html>" body)))))
 
 (deftest update-without-login
   (with-system [sut (test-system (test-map))]
@@ -98,8 +96,6 @@
       (is (or (.contains body  "only permitted to author and admin")
               (.contains body "Entry not in DB"))))))
 
-
-
 (deftest admin-session-test
   (with-system
     [sut (test-system (test-map+session "admin"))]
@@ -109,21 +105,18 @@
                                               (url-for :home))]
       (is (.contains body "admin")))))
 
-
 (with-system
-    [sut (test-system (test-map+session "admin"))]
-    (let [service (user/service-fn sut)]
-      (response-for service
-                    :get
-                    (url-for :home))))
+  [sut (test-system (test-map+session "admin"))]
+  (let [service (user/service-fn sut)]
+    (response-for service
+                  :get
+                  (url-for :home))))
 
 (comment
-  (run-tests)
-  )
-
+  (run-tests))
 
 ;;A HELPER FOR DEBUGGING:
-#_(:body (response-for (make-service-fn (make-session-store (constantly {:identity {:username "admin"}})
-                                                          (constantly nil)
-                                                          (constantly nil))) :get "/"))
 
+#_(:body (response-for (make-service-fn (make-session-store (constantly {:identity {:username "admin"}})
+                                                            (constantly nil)
+                                                            (constantly nil))) :get "/"))

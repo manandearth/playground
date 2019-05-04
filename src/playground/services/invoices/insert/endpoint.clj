@@ -3,8 +3,8 @@
    [clojure.java.jdbc :as jdbc]
    [clojure.spec.alpha :as spec]
    [honeysql.core :as h]
-   [playground.services.invoices.insert.logic :as logic]
-   [playground.models.user :as models.user]))
+   [playground.models.user :as models.user]
+   [playground.services.invoices.insert.logic :as logic]))
 
 (spec/def ::api (spec/keys :req-un [::models.user/amount]))
 
@@ -14,6 +14,5 @@
                                     (java.util.UUID/randomUUID)
                                     (get-in session [:identity :username]))
                    (h/format))
-        _      (jdbc/execute! db insert)
-        ]
+        _      (jdbc/execute! db insert)]
     {:status 301 :headers {"Location" "/invoices"} :body "" :flash "Inserted to DB"}))

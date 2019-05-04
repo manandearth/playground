@@ -1,15 +1,15 @@
 (ns playground.services.invoices.retrieve.view
-  (:require [hiccup.page :as page]
-            [playground.views :as views]))
-
+  (:require
+   [hiccup.page :as page]
+   [playground.views :as views]))
 
 (defn update-invoice [request user]
   (page/html5
    (views/gen-page-head "Invoice")
-   (views/header-links request)
-   [:div
-    [:h1 (str "Update user id: " (:id user))]
-    [:form {:action (str "/invoices-update/" (:id user)) :method "POST"}
+    (views/header-links request)
+    [:div
+     [:h1 (str "Update user id: " (:id user))]
+     [:form {:action (str "/invoices-update/" (:id user)) :method "POST"}
       [:div
        [:p [:label "id: " [:input {:type "hidden" :name "id" :value (:id user)}]] [:span (:id user)]]
        [:p [:label "amount: " [:input {:type "text" :name "name" :value (first (clojure.string/split (:email user) #"@"))}]]]

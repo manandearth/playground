@@ -1,16 +1,14 @@
 (ns playground.services.session.register.logic
   (:require
-   [honeysql.helpers :as hh]
-   [honeysql.core :as h]
-   [buddy.hashers :as hashers]))
+   [buddy.hashers :as hashers]
+   [honeysql.helpers :as hh]))
 
 (defn to-insert [username password & role]
   (let [values {:username username :password password}]
     (-> (hh/insert-into :register)
         (hh/values [(if-not role
-                       values
-                       (assoc values :role (first role))
-                       )]))))
+                      values
+                      (assoc values :role (first role)))]))))
 
 (defn to-check [username]
   (-> (hh/select :username)
@@ -19,4 +17,3 @@
 
 (defn derive-password [password]
   (hashers/derive password))
-

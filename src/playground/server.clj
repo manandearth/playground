@@ -1,11 +1,10 @@
 (ns playground.server
-  (:gen-class)
   (:require
    [com.stuartsierra.component :as component]
    [io.pedestal.http :as server]
    [io.pedestal.http.route :as route]
-   [playground.service :as service]
-   ))
+   [playground.service :as service])
+  (:gen-class))
 
 (def dev-http-port 8080)
 (def test-http-port 59800)
@@ -49,4 +48,3 @@
     (when (and service (not (test? service-map)))
       (server/stop service))
     (dissoc this :service)))
-

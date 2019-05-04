@@ -6,7 +6,7 @@
    [playground.services.invoices.retrieve-all.logic :as logic]
    [playground.services.invoices.retrieve-all.view :as view])
   (:import
-   [org.postgresql.jdbc4 Jdbc4Array]))
+   (org.postgresql.jdbc4 Jdbc4Array)))
 
 (cheshire.generate/add-encoder Jdbc4Array (fn [c json-generator]
                                             (-> c .getArray (cheshire.generate/encode-seq json-generator))))
