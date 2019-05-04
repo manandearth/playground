@@ -16,3 +16,7 @@
 (defn check-password [password encrypted]
   (hashers/check password encrypted))
 
+(defn role [username]
+  (-> (select :role)
+      (from :register)
+      (where [:= :username username])))

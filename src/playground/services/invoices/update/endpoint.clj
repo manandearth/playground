@@ -21,4 +21,3 @@
 
     (-> (ring-resp/redirect (url-for :invoices))
         (assoc :flash (str "Entry " id " has been updated")))))
-
