@@ -4,3 +4,8 @@
   {:select [:*]
    :from   [:users]
    :where  [:= :id id]})
+
+(defn get-author [id]
+  {:select [:author]
+   :from [:users]
+   :where [:= :id id]})

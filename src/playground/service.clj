@@ -28,6 +28,9 @@
    [buddy.auth :refer [authenticated?]]
    [buddy.hashers :as hashers]))
 
+(defn test-page [request]
+  (ring-resp/response (str (get-in request [:session :identity :username]))))
+
 (defn about-page [request]
   (ring-resp/response (views/about request)))
 
@@ -92,6 +95,25 @@
                     interceptor-chain/terminate)
                 )))})
 
+(def author-interceptor
+  "throw unauthorized 403 by author
+  (allows admin and author of entry)"
+  {:name ::author-interceptor
+   :enter (fn [context]
+            (let [role     (get-in context [:request :session :identity :role])
+                  username (get-in context [:request :session :identity :username])
+                  id       (get-in context [:request :path-params :id])
+                  db       (get-in context [:request :db])
+                  author (:author (invoices.retrieve/get-author (:request context)))]
+              (if (or (= role models.user/admin-role) (= username author))
+                context
+                (-> context
+                    (assoc :response {:status 403
+                                      :body "only permitted to author and admin"})
+                    interceptor-chain/terminate))))})
+
+
+
 ;;;;;;;;;;;;;;;;;;;
 (defn param-spec-interceptor
   "Coerces params according to a spec. If invalid, aborts the interceptor-chain with 422, explaining the issue."
@@ -131,6 +153,7 @@
   "Tabular routes"
   #{["/" :get (conj common-interceptors `home-page) :route-name :home]
     ["/about" :get (conj common-interceptors `about-page)]
+    ["/test" :get (conj common-interceptors `test-page)]
     ["/api" :get (into component-interceptors [http/json-body (param-spec-interceptor ::api :query-params) `api])]
     ;;FIXME change the routes definition format from: (def routes #{...})
     ;;to (def routes (io.pedestal.http.route.definition.table/table-routes ...))
@@ -143,7 +166,7 @@
     ["/invoices-insert" :get (into  common-interceptors [authentication-interceptor `insert-page])]
     ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
-    ["/invoices/:id" :get (into common-interceptors [authentication-interceptor (param-spec-interceptor ::invoices.retrieve/api :path-params) `invoices.retrieve/perform]) :route-name :invoices/:id]
+    ["/invoices/:id" :get (into common-interceptors [(param-spec-interceptor ::invoices.retrieve/api :path-params) author-interceptor `invoices.retrieve/perform]) :route-name :invoices/:id]
     ["/invoices" :get (conj common-interceptors `invoices.retrieve-all/perform) :route-name :invoices]
     ["/invoices-delete/:id" :get (into common-interceptors [http/json-body authentication-interceptor admin-interceptor (param-spec-interceptor ::invoices.delete/api :path-params) `invoices.delete/perform]) :route-name :invoices-delete/:id]
     })

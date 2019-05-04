@@ -11,6 +11,7 @@
 
 (spec/def ::api (spec/keys :req-un [::models.user/id]))
 
+
 (defn perform [{{:keys [id]} :path-params :keys [db session] :as request}]
   (let [db (->> db :pool (hash-map :datasource))
         _  (->> (logic/to-delete id)

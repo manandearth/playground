@@ -36,5 +36,3 @@
                      (assoc :session updated-session)))
       (-> (ring-resp/redirect (url-for :login))
           (assoc :flash "wrong password")))))
-
-
