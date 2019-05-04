@@ -62,16 +62,3 @@ The db connection url is configured in: `resources/jopin.edn`
 ### etaoin
 
 `etaoin` tests uses `user/test-system`.
-
-Create a parallel db with same tables (i.e users, register).
-
-populate the register table with:
-
-| username | password | role  |
-|----------+----------+-------|
-| admin    | admin    | admin |
-| user     | user     | user  |
-
-
-
-
