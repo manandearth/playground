@@ -1,8 +1,8 @@
 (ns playground.coerce
   (:require
+   [clojure.spec.alpha :as spec]
    [playground.spec-utils :refer [check!]]
-   [spec-coerce.core :as coerce]
-   [clojure.spec.alpha :as spec]))
+   [spec-coerce.core :as coerce]))
 
 (defn coerce
   ([v]

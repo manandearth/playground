@@ -1,7 +1,4 @@
-(ns playground.jobs.sample
-  (:require
-   ;; [background-processing.background-job :as background-job]
-   [io.pedestal.log :as log]))
+(ns playground.jobs.sample)
 
 ;; (defrecord Sample [temperature]
 ;;   background-job/BackgroundJob

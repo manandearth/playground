@@ -1,8 +1,7 @@
 (ns playground.services.session.register.logic
   (:require
-   [honeysql.helpers :as hh]
-   [honeysql.core :as h]
-   [buddy.hashers :as hashers]))
+   [buddy.hashers :as hashers]
+   [honeysql.helpers :as hh]))
 
 (defn to-insert [username password]
   (-> (hh/insert-into :register)

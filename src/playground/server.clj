@@ -1,11 +1,10 @@
 (ns playground.server
-  (:gen-class)
   (:require
    [com.stuartsierra.component :as component]
    [io.pedestal.http :as server]
    [io.pedestal.http.route :as route]
-   [playground.service :as service]
-   ))
+   [playground.service :as service])
+  (:gen-class))
 
 (def dev-map
   (-> service/service ;; start with production configuration
@@ -46,4 +45,3 @@
     (when (and service (not (test? service-map)))
       (server/stop service))
     (dissoc this :service)))
-
