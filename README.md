@@ -42,6 +42,13 @@ Playground is using `[juxt.modular/postgres "0.0.1-SNAPSHOT"]` which works on Po
 
 The original creation of the tables and migrations are managed with [joplin](https://github.com/juxt/joplin) 
 
+In order to create the databases:
+
+```
+createdb playground_dev
+createdb playground_test
+```
+
 To first set up (for example a dev postgres environment) run the following in a shell:
 `lein reset dev psql-dev`
 
