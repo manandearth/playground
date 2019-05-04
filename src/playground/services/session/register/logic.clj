@@ -3,12 +3,12 @@
    [buddy.hashers :as hashers]
    [honeysql.helpers :as hh]))
 
-(defn to-insert [username password & role]
+(defn to-insert [username password & [role]]
   (let [values {:username username :password password}]
     (-> (hh/insert-into :register)
         (hh/values [(if-not role
                       values
-                      (assoc values :role (first role)))]))))
+                      (assoc values :role role))]))))
 
 (defn to-check [username]
   (-> (hh/select :username)
