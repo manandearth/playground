@@ -16,7 +16,7 @@
    [ring.middleware.session.store :as session.store]
    [user]))
 
-(defn test-map [& session-store]
+(defn test-map [& [session-store]]
   (-> (service/service server/test-http-port) ;; TEST configuration
       (merge {:env                     :test
               ;; do not block thread that starts web server
@@ -28,7 +28,7 @@
               ::http/allowed-origins {:creds true :allowed-origins any?}
               ;; Content Security Policy (CSP) is mostly turned off in dev mode
               ::http/secure-headers  {:content-security-policy-settings {:object-src "none"}}
-              ::http/enable-session (if (seq session-store) {:session session-store} nil)})
+              ::http/enable-session (if session-store {:store session-store} nil)})
       http/default-interceptors
       http/dev-interceptors))
 
