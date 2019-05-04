@@ -103,12 +103,13 @@
                                               (url-for :home))]
       (is (.contains body "admin")))))
 
-(with-system
-  [sut (test-system (test-map+session "admin"))]
-  (let [service (user/service-fn sut)]
-    (response-for service
-                  :get
-                  (url-for :home))))
+(comment
+  (with-system
+    [sut (test-system (test-map+session "admin"))]
+    (let [service (user/service-fn sut)]
+      (response-for service
+                    :get
+                    (url-for :home)))))
 
 (comment
   (run-tests))
