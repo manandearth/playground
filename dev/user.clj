@@ -16,15 +16,12 @@
    [com.grzm.component.pedestal :as pedestal-component]
    [com.stuartsierra.component :as component]
    [com.stuartsierra.component.repl :refer [reset set-init system]]
-   ;[formatting-stack.component]
-   [modular.postgres]
-   [io.pedestal.test :refer [response-for]]
    [io.pedestal.http :as http]
    [io.pedestal.http.route :as route]
    [io.pedestal.http.route.definition.table :refer [table-routes]]
+   [io.pedestal.test :refer [response-for]]
+   [modular.postgres]
    [playground.server]
-   #_ [background-processing.background-processor :as background-processor]
-   #_ [background-processing.enqueuer :as enqueuer]
    [playground.service]))
 
 ;; ugly hack, will disappear when we use the newer project template
@@ -53,7 +50,6 @@
 (set-init (fn [_]
             (dev-system)))
 
-
 ;;response-for urls
 
 (defn service-fn
@@ -64,8 +60,8 @@
   (let [service (service-fn system)]
     (response-for service verb route)))
 
-
 ;;printing routes and interceptors
+
 (defn print-routes
   "Print our application's routes"
   []
@@ -107,4 +103,3 @@
          "\n"
          (into [name-line (repeat-str "-" (count name-line))]
                (map interceptor-info interceptors)))))))
-

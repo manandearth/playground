@@ -4,14 +4,12 @@
    [clojure.java.jdbc :as jdbc]
    [clojure.spec.alpha :as spec]
    [honeysql.core :as h]
-   [ring.util.response :as ring-resp]
-   [io.pedestal.http.route :refer [url-for]]
+   [playground.models.user :as models.user]
    [playground.services.invoices.retrieve.logic :as logic]
    [playground.services.invoices.retrieve.view :as view]
-   [playground.models.user :as models.user]
-   [playground.views :as views])
+   [ring.util.response :as ring-resp])
   (:import
-   [org.postgresql.jdbc4 Jdbc4Array]))
+   (org.postgresql.jdbc4 Jdbc4Array)))
 
 (cheshire.generate/add-encoder Jdbc4Array (fn [c json-generator]
                                             (-> c .getArray (cheshire.generate/encode-seq json-generator))))
