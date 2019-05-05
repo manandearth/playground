@@ -21,11 +21,9 @@
    [playground.services.session.login.endpoint :as session.login]
    [playground.services.session.register.endpoint :as session.register]
    [playground.views :as views]
+   [ring.middleware.session.store :as session.store]
    [ring.middleware.session.cookie :as cookie]
    [ring.util.response :as ring-resp]))
-
-(defn test-page [request]
-  (ring-resp/response (str (get-in request [:session :identity :username]))))
 
 (defn about-page [request]
   (ring-resp/response (views/about request)))
@@ -89,7 +87,7 @@
                                       :body   "Unauthorized"})
                     interceptor-chain/terminate))))})
 
-(def author-interceptor
+(defn author-interceptor [author-fn]
   "throw unauthorized 403 by author
   (allows admin and author of entry)"
   {:name ::author-interceptor
@@ -98,7 +96,7 @@
                   username (get-in context [:request :session :identity :username])
                   id       (get-in context [:request :path-params :id])
                   db       (get-in context [:request :db])
-                  author (:author (invoices.retrieve/get-author (:request context)))]
+                  author (author-fn (:request context))]
               (if (or (= role models.user/admin-role) (= username author))
                 context
                 (-> context
@@ -138,15 +136,21 @@
 
 (def session-interceptor (ring-middlewares/session {:store (cookie/cookie-store)}))
 
+(defn make-session-store
+  [reader writer deleter]
+  (reify session.store/SessionStore
+    (read-session [_ k] (reader k))
+    (write-session [_ k s] (writer k s))
+    (delete-session [_ k] (deleter k))))
+
 (def flash-interceptor (ring-middlewares/flash))
 
-(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body  session-interceptor flash-interceptor]))
+(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body  #_session-interceptor flash-interceptor]))
 
 (def routes
   "Tabular routes"
   #{["/" :get (conj common-interceptors `home-page) :route-name :home]
     ["/about" :get (conj common-interceptors `about-page)]
-    ["/test" :get (conj common-interceptors `test-page)]
     ["/api" :get (into component-interceptors [http/json-body (param-spec-interceptor ::api :query-params) `api])]
     ;;FIXME change the routes definition format from: (def routes #{...})
     ;;to (def routes (io.pedestal.http.route.definition.table/table-routes ...))
@@ -157,9 +161,9 @@
     ["/login" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.login/api :form-params) `session.login/perform])]
     ["/logout" :get (conj common-interceptors `logout)]
     ["/invoices-insert" :get (into  common-interceptors [authentication-interceptor `insert-page])]
-    ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
+    ["/invoices-insert" :post (into common-interceptors [http/json-body authentication-interceptor (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
-    ["/invoices/:id" :get (into common-interceptors [(param-spec-interceptor ::invoices.retrieve/api :path-params) author-interceptor `invoices.retrieve/perform]) :route-name :invoices/:id]
+    ["/invoices/:id" :get (into common-interceptors [(param-spec-interceptor ::invoices.retrieve/api :path-params) (author-interceptor invoices.retrieve/get-author) `invoices.retrieve/perform]) :route-name :invoices/:id]
     ["/invoices" :get (conj common-interceptors `invoices.retrieve-all/perform) :route-name :invoices]
     ["/invoices-delete/:id" :get (into common-interceptors [http/json-body authentication-interceptor admin-interceptor (param-spec-interceptor ::invoices.delete/api :path-params) `invoices.delete/perform]) :route-name :invoices-delete/:id]})
 
@@ -177,7 +181,7 @@
 
 ;; Consumed by playground.server/create-server
 ;; See http/default-interceptors for additional options you can configure
-(def service
+(defn service [port]
   {:env                     :prod
    ;; You can bring your own non-default interceptors. Make
    ;; sure you include routing and set it up right for
@@ -208,7 +212,7 @@
    ;; This can also be your own chain provider/server-fn -- http://pedestal.io/reference/architecture-overview#_chain_provider
    ::http/type              :jetty
    ;; ::http/host "localhost"
-   ::http/port              8080
+   ::http/port              port
    ;; Options to pass to the container (Jetty)
    ::http/container-options {:h2c? true
                              :h2?  false

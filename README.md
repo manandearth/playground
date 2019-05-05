@@ -36,17 +36,29 @@ It requires to have the following namespaces required:
 
 ## DB
 
-`[juxt.modular/postgres "0.0.1-SNAPSHOT"]` works on PostgreSQL upto verion 9.6 and **not** later..
+Playground is using `[juxt.modular/postgres "0.0.1-SNAPSHOT"]` which works on PostgreSQL upto verion 9.6 and **not** later..
 
-For the service.invoices ns create a table:
+### Migration
 
+The original creation of the tables and migrations are managed with [joplin](https://github.com/juxt/joplin) 
 
+In order to create the databases:
 
-and register table that keeps auth login data:
+```
+createdb playground_dev
+createdb playground_test
+```
 
-`CREATE TABLE register ( username VARCHAR(20), password VARCHAR(100), role VARCHAR(20) DEFAULT 'user');`
+To first set up (for example a dev postgres environment) run the following in a shell:
+`lein reset dev psql-dev`
 
-to alter role to admin:
+For the tests create a parallel db then the tables using:
+`lein reset test psql-test` 
 
-`UPDATE register SET ROLE = 'admin' WHERE username = 'foo';`
+The db connection url is configured in: `resources/jopin.edn`
 
+## TESTS
+
+### etaoin
+
+`etaoin` tests uses `user/test-system`.

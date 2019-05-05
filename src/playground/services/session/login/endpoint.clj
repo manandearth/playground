@@ -28,7 +28,7 @@
   (let [username (get-in request [:form-params :username])
         password (get-in request [:form-params :password])
         session (:session request)]
-    (if (logic/check-password password (:password (password-by-username request username)))
+    (if (logic/check-password password (:encrypted_password (password-by-username request username)))
       (let [next-url (get-in request [:query-params :next] "/")
             updated-session (assoc session :identity (conj {:username username} (get-role request username)))]
         (-> (ring-resp/redirect next-url)
