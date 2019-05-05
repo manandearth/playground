@@ -9,7 +9,7 @@
       (where  [:= :username username] [:= :password password])))
 
 (defn query-pass-by-user [username]
-  (-> (select :password)
+  (-> (select :encrypted_password)
       (from :register)
       (where [:= :username username])))
 
