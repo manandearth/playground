@@ -21,6 +21,7 @@
    [playground.services.session.login.endpoint :as session.login]
    [playground.services.session.register.endpoint :as session.register]
    [playground.views :as views]
+   [ring.middleware.session.store :as session.store]
    [ring.middleware.session.cookie :as cookie]
    [ring.util.response :as ring-resp]))
 
@@ -135,9 +136,16 @@
 
 (def session-interceptor (ring-middlewares/session {:store (cookie/cookie-store)}))
 
+(defn make-session-store
+  [reader writer deleter]
+  (reify session.store/SessionStore
+    (read-session [_ k] (reader k))
+    (write-session [_ k s] (writer k s))
+    (delete-session [_ k] (deleter k))))
+
 (def flash-interceptor (ring-middlewares/flash))
 
-(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body  session-interceptor flash-interceptor]))
+(def common-interceptors (into component-interceptors [(body-params/body-params) http/html-body  #_session-interceptor flash-interceptor]))
 
 (def routes
   "Tabular routes"

@@ -6,7 +6,6 @@
    [com.grzm.component.pedestal :as pedestal-component]
    [com.stuartsierra.component :as component]
    [io.pedestal.http :as http]
-   [io.pedestal.http :as http]
    [io.pedestal.http.route :as route]
    [io.pedestal.http.route.definition.table :refer [table-routes]]
    [io.pedestal.test :refer [response-for]]
@@ -50,17 +49,12 @@
    ;:formatting-stack (formatting-stack.component/map->Formatter {})
    ))
 
-(defn make-session-store
-  [reader writer deleter]
-  (reify session.store/SessionStore
-    (read-session [_ k] (reader k))
-    (write-session [_ k s] (writer k s))
-    (delete-session [_ k] (deleter k))))
-
 (defn test-map+session [username]
-  (let [session-store (make-session-store (constantly {:identity {:username username}})
-                                          (constantly nil)
-                                          (constantly nil))]
+  (let [session-store (service/make-session-store (fn [& _]
+                                                    {:identity {:username username}})
+                                                  (fn [& _]
+                                                    {:identity {:username username}})
+                                                  (constantly nil))]
     (test-map session-store)))
 
 (def url-for (route/url-for-routes

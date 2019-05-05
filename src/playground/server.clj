@@ -3,7 +3,9 @@
    [com.stuartsierra.component :as component]
    [io.pedestal.http :as server]
    [io.pedestal.http.route :as route]
-   [playground.service :as service])
+   [io.pedestal.http :as http]
+   [playground.service :as service]
+   [ring.middleware.session.cookie :as cookie])
   (:gen-class))
 
 (def dev-http-port 8080)
@@ -20,7 +22,8 @@
               ;; all origins are allowed in dev mode
               ::server/allowed-origins {:creds true :allowed-origins any?}
               ;; Content Security Policy (CSP) is mostly turned off in dev mode
-              ::server/secure-headers  {:content-security-policy-settings {:object-src "none"}}})
+              ::server/secure-headers  {:content-security-policy-settings {:object-src "none"}}
+              ::http/enable-session {:store (cookie/cookie-store)}})
       server/default-interceptors
       server/dev-interceptors))
 
