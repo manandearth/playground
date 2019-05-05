@@ -87,7 +87,7 @@
                                       :body   "Unauthorized"})
                     interceptor-chain/terminate))))})
 
-(def author-interceptor
+(defn author-interceptor [author-fn]
   "throw unauthorized 403 by author
   (allows admin and author of entry)"
   {:name ::author-interceptor
@@ -96,7 +96,7 @@
                   username (get-in context [:request :session :identity :username])
                   id       (get-in context [:request :path-params :id])
                   db       (get-in context [:request :db])
-                  author (:author (invoices.retrieve/get-author (:request context)))]
+                  author (author-fn (:request context))]
               (if (or (= role models.user/admin-role) (= username author))
                 context
                 (-> context
@@ -163,7 +163,7 @@
     ["/invoices-insert" :get (into  common-interceptors [authentication-interceptor `insert-page])]
     ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
-    ["/invoices/:id" :get (into common-interceptors [(param-spec-interceptor ::invoices.retrieve/api :path-params) author-interceptor `invoices.retrieve/perform]) :route-name :invoices/:id]
+    ["/invoices/:id" :get (into common-interceptors [(param-spec-interceptor ::invoices.retrieve/api :path-params) (author-interceptor invoices.retrieve/get-author) `invoices.retrieve/perform]) :route-name :invoices/:id]
     ["/invoices" :get (conj common-interceptors `invoices.retrieve-all/perform) :route-name :invoices]
     ["/invoices-delete/:id" :get (into common-interceptors [http/json-body authentication-interceptor admin-interceptor (param-spec-interceptor ::invoices.delete/api :path-params) `invoices.delete/perform]) :route-name :invoices-delete/:id]})
 

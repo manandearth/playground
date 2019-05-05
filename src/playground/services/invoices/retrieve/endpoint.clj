@@ -31,5 +31,6 @@
         record (->> (logic/get-author id)
                     (h/format)
                     (jdbc/query db)
-                    (first))]
+                    (first)
+                    (:author))]
     record))
