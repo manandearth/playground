@@ -161,7 +161,7 @@
     ["/login" :post (into common-interceptors [http/json-body (param-spec-interceptor ::session.login/api :form-params) `session.login/perform])]
     ["/logout" :get (conj common-interceptors `logout)]
     ["/invoices-insert" :get (into  common-interceptors [authentication-interceptor `insert-page])]
-    ["/invoices-insert" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
+    ["/invoices-insert" :post (into common-interceptors [http/json-body authentication-interceptor (param-spec-interceptor ::invoices.insert/api :form-params) `invoices.insert/perform])]
     ["/invoices-update/:id" :post (into common-interceptors [http/json-body (param-spec-interceptor ::invoices.update/api :form-params) `invoices.update/perform])]
     ["/invoices/:id" :get (into common-interceptors [(param-spec-interceptor ::invoices.retrieve/api :path-params) (author-interceptor invoices.retrieve/get-author) `invoices.retrieve/perform]) :route-name :invoices/:id]
     ["/invoices" :get (conj common-interceptors `invoices.retrieve-all/perform) :route-name :invoices]
